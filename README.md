@@ -21,6 +21,7 @@
 - Refactor our code to add constants file + create a components folder
 - You cannot access other route without login
 - if token is not present redirect user to login page
+- logout feature
 Body
 Navabar
 Route=/=>feed
