@@ -26,7 +26,8 @@
 - build the user card on feed
 - Edit profile feature
 - show toast message on edit of profile
-- see all my connections
+- New page- see all my connections
+- New page- see all my connection requests
 
 Body
 Navabar
