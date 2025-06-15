@@ -29,8 +29,8 @@
 - New page- see all my connections
 - New page- see all my connection requests
 - feature - Accept/reject connection request
-- Remainning :
 - send ignore the user card from feed
+- Remainning :
 - sign up new user
 - E2E testing
 
