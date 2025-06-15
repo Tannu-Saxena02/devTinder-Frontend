@@ -28,6 +28,11 @@
 - show toast message on edit of profile
 - New page- see all my connections
 - New page- see all my connection requests
+- feature - Accept/reject connection request
+- Remainning :
+- send ignore the user card from feed
+- sign up new user
+- E2E testing
 
 Body
 Navabar

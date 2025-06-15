@@ -27,7 +27,7 @@ const Connections = () => {
 
   if (!connections) return;
 
-  if (connections.length === 0) return <h1> No Connections Found</h1>;
+  if (connections.length === 0) return <h1 className="flex justify-center my-10"> No Connections Found</h1>;
 
   return (
     <div className="text-center my-10">
@@ -44,7 +44,7 @@ const Connections = () => {
             <div>
               <img
                 alt="photo"
-                className="w-20 h-20 rounded-full"
+                className="w-20 h-20 rounded-full object-cover"
                 src={photoUrl}
               />
             </div>
