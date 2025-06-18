@@ -39,3 +39,16 @@ Route=/=>feed
 ROute=/login=>Login
 Route=/connections=>Connections
 Router=/profile=>Profile
+
+TODO for frontend:
+validation on field and add dropdown
+Error handling on API frontend
+Terms and condition 
+Privacy policy page
+OTP screen and verify otp screen
+
+Goggle auth Implementation
+beautify Ui and responsiveness
+
+
+

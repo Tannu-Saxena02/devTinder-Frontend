@@ -4,9 +4,9 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
 const Login = () => {
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -24,7 +24,7 @@ const Login = () => {
         { withCredentials: true }
       );
       console.log(res.data.data);
-      
+
       dispatch(addUser(res.data.data));
       return navigate("/profile");
     } catch (err) {
@@ -127,6 +127,15 @@ const Login = () => {
               ? "New User? Signup Here"
               : "Existing User? Login Here"}
           </p>
+
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                console.log(credentialResponse);
+              }}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
         </div>
       </div>
     </div>
