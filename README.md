@@ -93,4 +93,9 @@ beautify Ui and responsiveness
         proxy_cache_bypass $http_upgrade;
    }
 
-
+Frontend:http://13.49.241.157/
+backend:http://13.49.241.157:3000/
+Domain name = devTinder.com = 13.49.241.157
+Frontend = devTinder.com
+backend = devTinder.com:3000/ => devTinder.com/api
+try_files $uri $uri/ =404;
