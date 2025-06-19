@@ -52,3 +52,45 @@ beautify Ui and responsiveness
 
 
 
+# Deployment
+- we need a software to deploy our frontend application.it acts as webserver but we used to host frontend.it gives us http server
+- nginx,AWS,how we manually deploy our application
+# Deployment Steps :
+- Singup on AWS
+- Launch instance
+- chmod 400 <secret>.pem
+- ssh -i
+- Install node version that currently in use
+- Git clone
+# Frontend
+  - npm install -dependencies install
+  - npm run build
+  - sudo apt update
+  - sudo apt install nginx
+  - sudo systemctl start nginx
+  - sudo systemctl enable nginx
+  - copy code from dist(build files) to /var/www/html/
+  - sudo scp -r dist/* var/www/html/
+  - Enable port :80 of your instance
+# Backend
+ - Update DB password
+ - allowed ec2 instance piblic IP on mongodb server
+ - npm install pm2 -g
+ - pm2 start npm --name "devTinder-backend" -- start
+ - pm2 logs
+ - pm2 list, pm2 flush <name>, pm2 stop <name>, pm2 delete<name>
+ - config nginx - /etc/nginx/sites-available/default
+ - restart nginx - sudo systemctl restart nginx
+ - Modify the BASEURL in frontend project to "/api"
+# Nginx config
+ server_name 13.49.241.157;
+   location /api/ {
+        proxy_pass http://localhost:3000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+   }
+
+
