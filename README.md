@@ -70,7 +70,7 @@ beautify Ui and responsiveness
   - sudo systemctl start nginx
   - sudo systemctl enable nginx
   - copy code from dist(build files) to /var/www/html/
-  - sudo scp -r dist/* var/www/html/
+  -  sudo scp -r dist/* /var/www/html/
   - Enable port :80 of your instance
 # Backend
  - Update DB password
@@ -99,3 +99,21 @@ Domain name = devTinder.com = 13.49.241.157
 Frontend = devTinder.com
 backend = devTinder.com:3000/ => devTinder.com/api
 try_files $uri $uri/ =404;
+
+# Real time using WebSocket(Socket.io)
+- Build the UI for a chat window on /chat/:targetUserId
+- setup socket.io in backend
+- npm i socket.io
+- Setup frontend socket.io-client
+- Initialise the chat
+- createSocketConnection
+- Listen to events
+- Homework:improve the UI
+- Homework: Fix the security Bug-auth in websockets
+- Homework:fix bug:if I'm not friend then I should be able to send messages
+   check userid same as logedinuserid,both userId,targetUserID are friends
+- Homework: feat: Show Green sysmbol when online??? -[last seen 2 hour ago]
+    connection established store timestamp
+- Homework: Limit messages when fetching from DB(pagination)
+
+
