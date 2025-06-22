@@ -13,20 +13,60 @@ const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [errorFirstName, setErrorFirstName] = useState("");
+  const [errorLastName, setErrorLastName] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
+  const [errorPassword, setErrorPassword] = useState("");
+  //  const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // for error 
   const handleSignUp = async () => {
     try {
-      const res = await axios.post(
-        BASE_URL + "/signup",
-        { firstName, lastName, emailId, password },
-        { withCredentials: true }
-      );
-      console.log(res.data.data);
 
-      dispatch(addUser(res.data.data));
-      return navigate("/profile");
+      if (!firstName) {
+        setErrorFirstName("FirstName required");
+        return;
+      }
+      if (!lastName) {
+        setErrorLastName("LastName required");
+        return;
+      }
+      else if (!/\S+@\S+\.\S+/.test(emailId)) {
+        setErrorEmail("Invalid email format");
+        return;
+      }
+      else {
+        setErrorFirstName("");
+        setErrorLastName("");
+        setErrorEmail("");
+
+        const res = await axios.post(
+          BASE_URL + "/signup",
+          { firstName, lastName, emailId, password },
+          { withCredentials: true }
+        );
+        console.log(res.data.data);
+
+        dispatch(addUser(res.data.data));
+        // return navigate("/profile");
+        return navigate("/terms"); 
+
+      }
+
+
+
+
+      // const res = await axios.post(
+      //   BASE_URL + "/signup",
+      //   { firstName, lastName, emailId, password },
+      //   { withCredentials: true }
+      // );
+      // console.log(res.data.data);
+
+      // dispatch(addUser(res.data.data));
+      // return navigate("/profile");
     } catch (err) {
       setError(err?.response?.data || "Something went wrong");
     }
@@ -35,16 +75,41 @@ const Login = () => {
     try {
       console.log("api hit");
 
-      const res = await axios.post(
-        BASE_URL + "/login",
-        {
-          emailId,
-          password,
-        },
-        { withCredentials: true }
-      );
-      dispatch(addUser(res.data));
-      return navigate("/");
+      if (!emailId) {
+        setErrorEmail("Email ID required");
+        return;
+      }
+      if (!password) {
+        setErrorPassword("Password required");
+        return;
+      }
+
+      else {
+        setErrorEmail("");
+        setErrorPassword("");
+        const res = await axios.post(
+          BASE_URL + "/login",
+          {
+            emailId,
+            password,
+          },
+          { withCredentials: true }
+        );
+        dispatch(addUser(res.data));
+        return navigate("/");
+
+      }
+
+      // const res = await axios.post(
+      //   BASE_URL + "/login",
+      //   {
+      //     emailId,
+      //     password,
+      //   },
+      //   { withCredentials: true }
+      // );
+      // dispatch(addUser(res.data));
+      // return navigate("/");
     } catch (err) {
       setError(err?.response?.data || "Something went wrong");
     }
@@ -65,10 +130,20 @@ const Login = () => {
                 <input
                   type="text"
                   value={firstName}
-                  className="input input-bordered w-full max-w-xs"
-                  onChange={(e) => setFirstName(e.target.value)}
+                  className={`input input-bordered w-full max-w-xs `}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFirstName(val);
+
+                    // clear the firstname error if the input is valid
+                    if (val.trim() !== "") {
+                      setErrorFirstName("");
+                    }
+                  }}
                 />
+                {errorFirstName && <p style={{ color: "red" }}>{errorFirstName}</p>}
               </label>
+
               <label className="form-control w-full max-w-xs my-2">
                 <div className="label">
                   <span className="label-text">Last Name</span>
@@ -77,8 +152,16 @@ const Login = () => {
                   type="text"
                   value={lastName}
                   className="input input-bordered w-full max-w-xs"
-                  onChange={(e) => setLastName(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setLastName(val);
+                    // clear the lastname error
+                    if (val.trim() !== "") {
+                      setErrorLastName("");
+                    }
+                  }}
                 />
+                {errorLastName && <p style={{ color: "red" }}>{errorLastName}</p>}
               </label>
             </>
           )}
@@ -88,10 +171,16 @@ const Login = () => {
               type="text"
               value={emailId}
               onChange={(e) => {
-                setEmailId(e.target.value);
+                const val = e.target.value;
+                setEmailId(val);
+                // clear the email error if the input is valid
+                if (/\S+@\S+\.\S+/.test(val)) {
+                  setErrorEmail("");
+                }
               }}
               className="input"
             />
+            {errorEmail && <p style={{ color: "red" }}>{errorEmail}</p>}
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Password</legend>
@@ -100,9 +189,15 @@ const Login = () => {
               className="input"
               value={password}
               onChange={(e) => {
-                setPassword(e.target.value);
+                const val = e.target.value;
+                setPassword(val);
+                // clear the password error if the input is valid
+                if (val.trim() !== "") {
+                  setErrorPassword("");
+                }
               }}
             />
+            {errorPassword && <p style={{ color: "red" }}>{errorPassword}</p>}
           </fieldset>
           <p className="text-red-500">{error}</p>
           <div className="card-actions justify-center my-2">

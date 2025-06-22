@@ -6,8 +6,8 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 
 const EditProfile = ({ user }) => {
-  console.log("edit profilw"+user);
-  
+  console.log("edit profilw" + user);
+
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [photoUrl, setPhotoUrl] = useState(user.photoUrl);
@@ -96,17 +96,37 @@ const EditProfile = ({ user }) => {
                     onChange={(e) => setAge(e.target.value)}
                   />
                 </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
+                {/* <label className="form-control w-full max-w-xs my-2"> */}
+                  {/* <div className="label">
                     <span className="label-text">Gender:</span>
-                  </div>
-                  <input
+                  </div> */}
+                  {/* <input
                     type="text"
                     value={gender}
                     className="input input-bordered w-full max-w-xs"
                     onChange={(e) => setGender(e.target.value)}
-                  />
-                </label>
+                  /> */}
+                  {/* </label> */}
+
+                   <div className="form-control w-full max-w-xs">
+      <label className="label">
+        <span className="label-text text-lg font-semibold">Gender:</span>
+      </label>
+      <select
+        className="select select-bordered w-full max-w-xs"
+        value={gender}
+        onChange={(e) => setGender(e.target.value)}
+      >
+        <option disabled value="">
+          Select Gender
+        </option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+
                 <label className="form-control w-full max-w-xs my-2">
                   <div className="label">
                     <span className="label-text">About:</span>
