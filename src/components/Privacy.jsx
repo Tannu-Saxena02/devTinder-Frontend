@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Terms = () => {
+const Privacy = () => {
   const navigate = useNavigate();
   const termsRef = useRef(null);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
@@ -43,7 +43,7 @@ const Terms = () => {
       <div className="card w-full max-w-7xl bg-white  p-6">
         <div className="flex justify-center items-center ">
           {/* <h2 className="card-title text-3xl font-semibold text-center mb-4  "> */}
-          <h2 className="text-4xl font-bold text-center">Terms & Conditions</h2>
+          <h2 className="text-4xl font-bold text-center">Privacy Policy</h2>
         </div>
         {/* Scrollable Content - 50% of the viewport height */}
         <div
@@ -175,4 +175,4 @@ const Terms = () => {
   );
 };
 
-export default Terms;
+export default Privacy;
