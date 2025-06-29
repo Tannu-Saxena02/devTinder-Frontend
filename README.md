@@ -43,14 +43,31 @@ Router=/profile=>Profile
 TODO for frontend:
 validation on field and add dropdown
 Error handling on API frontend
-Terms and condition 
-Privacy policy page
-OTP screen and verify otp screen
+Terms and condition -black page issue
+Privacy policy page -black page issue
+OTP screen and verify otp screen -timer 30sec & resend-30sec -black page issue
+sendotp & verify & google api implementation 
+success & error dialog show on otp send & on api error
 
 Goggle auth Implementation
+
+
+Drawer Implementation
 beautify Ui and responsiveness
-
-
+APP ICON and NAME (done)
+front page for UI  
+change and forgot password api & UI
+AI Asistant for FAQ
+Light & dark mode
+ TODO backend:
+validation and code correction backend(testing)
+otp Send API & verify otp API (done)
+: https://dev.to/manthanank/building-an-otp-verification-system-with-nodejs-and-mongodb-2p0o
+- read about SMTP server and how it work with send mail
+Goggle auth API (done)
+deployment  (done)
+payment gateway 
+chat Feature. (done)
 
 # Deployment
 - we need a software to deploy our frontend application.it acts as webserver but we used to host frontend.it gives us http server

@@ -187,7 +187,7 @@ const Chat = ({ onSend }) => {
     return extensions.some((ext) => url.toLowerCase().endsWith(ext));
   };
   return (
-    <div className="w-3/4 mx-auto border border-gray-600 m-5 h-[70vh] flex flex-col">
+    <div className="w-full mx-auto border border-gray-600 mx-9 h-[82vh] flex flex-col">
       <div className="flex flex-row items-center p-2">
         <div className="w-10 h-10 rounded-full overflow-hidden mx-2">
           <img
