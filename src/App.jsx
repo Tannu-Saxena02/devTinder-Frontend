@@ -14,6 +14,7 @@ import Connections from './components/Connections'
 import Requests from './components/Requests'
 import Terms from "./components/Terms";
 import Chat from './components/Chat'
+import OtpVerification from './components/OtpVerification'  
 
 
 
@@ -34,6 +35,7 @@ function App() {
       <Route path="/profile" element={<Profile/>}/>
       <Route path="/terms" element={<Terms />} />
       <Route path="/chat/:targetUserId" element={<Chat/>}/>
+      <Route path= "/otpverification" element={< OtpVerification/>}/>
       </Route>
     </Routes>
     </BrowserRouter>

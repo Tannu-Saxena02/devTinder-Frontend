@@ -17,7 +17,8 @@ const Login = () => {
   const [errorLastName, setErrorLastName] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
-  //  const [errors, setErrors] = useState({});
+  const [loginStatus, setLoginStatus] = useState(""); // "success", "error"
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -51,7 +52,7 @@ const Login = () => {
 
         dispatch(addUser(res.data.data));
         // return navigate("/profile");
-        return navigate("/terms"); 
+        return navigate("/terms");
 
       }
 
@@ -96,6 +97,7 @@ const Login = () => {
           { withCredentials: true }
         );
         dispatch(addUser(res.data));
+        setLoginStatus("success");
         return navigate("/");
 
       }
@@ -111,6 +113,7 @@ const Login = () => {
       // dispatch(addUser(res.data));
       // return navigate("/");
     } catch (err) {
+      setLoginStatus("error");
       setError(err?.response?.data || "Something went wrong");
     }
   };
@@ -223,16 +226,62 @@ const Login = () => {
               : "Existing User? Login Here"}
           </p>
 
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                console.log(credentialResponse);
-              }}
-              onError={() => {
-                console.log("Login Failed");
-              }}
-            />
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              console.log(credentialResponse);
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+          />
         </div>
       </div>
+
+      {/* Modal */}
+      {/* Dialoguebox */}
+      <input
+        type="checkbox"
+        id="login-modal"
+        className="modal-toggle"
+        checked={loginStatus !== ""}
+        readOnly
+      />
+      <div className="modal">
+        <div className="modal-box rounded-3xl border shadow-lg p-6 bg-base-100 text-center">
+          <div className="flex justify-center mb-4">
+            {loginStatus === "success" ? (
+              <div className="text-green-500 text-5xl">✅</div>
+            ) : (
+              <div className="text-red-500 text-5xl">❌</div>
+            )}
+          </div>
+
+          <h3 className={`text-2xl font-semibold mb-2 ${loginStatus === "success" ? "text-green-600" : "text-red-600"}`}>
+            {loginStatus === "success" ? "Login Successful" : "Login Failed"}
+          </h3>
+
+          <p className="text-sm text-gray-600 mb-4">
+            {loginStatus === "success"
+              ? "Welcome back! Redirecting you to your profile..."
+              : "Oops! The email or password you entered is incorrect."}
+          </p>
+
+          <div className="modal-action flex justify-center">
+            <label
+              htmlFor="login-modal"
+              className="btn btn-sm px-6 rounded-full btn-outline"
+              onClick={() => {
+                setLoginStatus("");
+                if (loginStatus === "success") navigate("/profile");
+              }}
+            >
+              Close
+            </label>
+          </div>
+        </div>
+      </div>
+
+
     </div>
   );
 };
