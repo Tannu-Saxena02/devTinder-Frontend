@@ -53,12 +53,14 @@ Goggle auth Implementation
 
 
 Drawer Implementation
-beautify Ui and responsiveness
-APP ICON and NAME (done)
 front page for UI  
 change and forgot password api & UI
-AI Asistant for FAQ
 Light & dark mode
+
+beautify Ui and responsiveness
+APP ICON and NAME (done)
+AI Asistant for FAQ
+
  TODO backend:
 validation and code correction backend(testing)
 otp Send API & verify otp API (done)

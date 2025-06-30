@@ -35,9 +35,31 @@ const Navbar = () => {
               className="w-10 h-10 rounded-full"
               src={applogo}
             />
-            <div className="mx-2" style={{color:"#feba00"}}>DevConnect</div>
+            <div className="mx-2" style={{ color: "#feba00" }}>
+              DevConnect
+            </div>
           </Link>
         </div>
+        {!user && (
+          <div className="flex gap-2 mx-5 justify-center">
+            <Link className="justify-between" to="/login">
+              <div
+                className="mx-5"
+                style={{ fontSize: 17, fontWeight: "500", color: "#ffffff" }}
+              >
+                Login
+              </div>
+            </Link>
+            <Link className="justify-between" to="/signup">
+              <div
+                className="mx-5"
+                style={{ fontSize: 17, fontWeight: "400", color: "#ffffff" }}
+              >
+                Sign Up
+              </div>
+            </Link>
+          </div>
+        )}
         {user && (
           <div className="flex gap-2 mx-5 justify-center">
             <div className="form-control justify-center mx-3 my-2">

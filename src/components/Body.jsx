@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import LandingPage from "./LandingPage";
 
 const Body = () => {
   const dispatch=useDispatch();
@@ -36,7 +37,7 @@ const Body = () => {
   return (
     <div>
       <Navbar />
-      <Outlet />
+      <LandingPage />
       {/* //to render the child component */}
       <Footer />
     </div>
