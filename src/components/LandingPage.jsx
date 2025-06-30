@@ -177,7 +177,7 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, []);
   return (
-    <div style={{ background: "red", width: "100%" }}>
+    <div>
       <div className="flex flex-col items-center justify-center">
         <img
           style={{ width: 180, height: 180, marginTop: 60, marginBottom: 10 }}
@@ -300,7 +300,7 @@ const LandingPage = () => {
       {/* //with img/ */}
       <div
         ref={scrollContainerRef}
-        className="flex flex-row mx-2 my-20"
+        className="flex flex-row my-20"
         style={{
           overflowX: "auto",
           whiteSpace: "nowrap",
