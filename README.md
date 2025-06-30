@@ -53,7 +53,7 @@ Goggle auth Implementation
 
 
 Drawer Implementation
-front page for UI  
+front page for UI  (almost)
 change and forgot password api & UI
 Light & dark mode
 
@@ -136,3 +136,6 @@ try_files $uri $uri/ =404;
 - Homework: Limit messages when fetching from DB(pagination)
 
 
+
+
+diffulcities: online status,used redux in theme?

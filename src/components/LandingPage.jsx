@@ -23,6 +23,7 @@ import { GrPersonalComputer } from "react-icons/gr";
 import { SiAuthentik } from "react-icons/si";
 import { VscGraphLine } from "react-icons/vsc";
 import { FaGlobeAfrica } from "react-icons/fa";
+import Footer from "./Footer";
 
 const LandingPage = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -176,7 +177,7 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, []);
   return (
-    <div>
+    <div style={{ background: "red", width: "100%" }}>
       <div className="flex flex-col items-center justify-center">
         <img
           style={{ width: 180, height: 180, marginTop: 60, marginBottom: 10 }}
@@ -408,19 +409,19 @@ const LandingPage = () => {
           connect meaningfully in a digital-first world.
         </div>
       </div>
-       <div
+      <div
         style={{
           fontSize: 37,
           fontWeight: "bold",
           marginTop: 60,
           marginBottom: 20,
           // color: "#E2646E",
-          color:"#feba00",
+          color: "#feba00",
           justifyContent: "center",
           textAlign: "center",
         }}
       >
-       Core Offering
+        Core Offering
       </div>
       <div className="flex flex-row flex-wrap mx-2 mb-30 items-center justify-center">
         {Data.map(({ id, img: IconComponent, desc }, index) => {
@@ -476,6 +477,7 @@ const LandingPage = () => {
           );
         })}
       </div>
+      <Footer />
     </div>
   );
 };

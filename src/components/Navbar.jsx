@@ -5,9 +5,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { removeUser } from "../utils/userSlice";
 import applogo from "../assets/chatdev.png"; // Assuming you have a logo image
+import { addTheme } from "../utils/themeSlice";
+import { MdDarkMode } from "react-icons/md";
+import { MdLightMode } from "react-icons/md";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
+  const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleLogout = async () => {
@@ -24,6 +28,11 @@ const Navbar = () => {
     } catch (err) {
       console.log(err);
     }
+  };
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    dispatch(addTheme(newTheme));
+    console.log(newTheme);
   };
   return (
     <div>
@@ -45,7 +54,14 @@ const Navbar = () => {
             <Link className="justify-between" to="/login">
               <div
                 className="mx-5"
-                style={{ fontSize: 17, fontWeight: "500", color: "#ffffff" }}
+                style={{
+                  fontSize: 17,
+                  fontWeight: "500",
+                  color: "#ffffff",
+                }}
+                onnclick={() => {
+                  navigate("/login");
+                }}
               >
                 Login
               </div>
@@ -54,15 +70,22 @@ const Navbar = () => {
               <div
                 className="mx-5"
                 style={{ fontSize: 17, fontWeight: "400", color: "#ffffff" }}
+                onnclick={() => {
+                  navigate("/login");
+                }}
               >
                 Sign Up
               </div>
             </Link>
           </div>
         )}
+
         {user && (
           <div className="flex gap-2 mx-5 justify-center">
-            <div className="form-control justify-center mx-3 my-2">
+            <div
+              className="form-control justify-center mx-3 my-2"
+              style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+            >
               Welcome, {user.firstName}
             </div>
             <div className="dropdown dropdown-end">
@@ -95,10 +118,18 @@ const Navbar = () => {
                   <Link to="/requests">Requests</Link>
                 </li>
                 <li>
+                  <div onClick={toggleTheme}>
+                    {theme === "dark" ? <MdDarkMode /> : <MdLightMode />}
+                    {theme === "dark" ? "Dark Mode" : "Light Mode"}
+                  </div>
+                </li>
+                <li>
                   <Link onClick={handleLogout}>Logout</Link>
                 </li>
               </ul>
             </div>
+
+            {/* <Button title="Toggle Theme" onPress={toggleTheme} /> */}
           </div>
         )}
       </div>

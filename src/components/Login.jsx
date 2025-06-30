@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 
 const Login = () => {
   const [firstName, setFirstName] = useState("");
@@ -22,10 +22,9 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // for error 
+  // for error
   const handleSignUp = async () => {
     try {
-
       if (!firstName) {
         setErrorFirstName("FirstName required");
         return;
@@ -33,12 +32,10 @@ const Login = () => {
       if (!lastName) {
         setErrorLastName("LastName required");
         return;
-      }
-      else if (!/\S+@\S+\.\S+/.test(emailId)) {
+      } else if (!/\S+@\S+\.\S+/.test(emailId)) {
         setErrorEmail("Invalid email format");
         return;
-      }
-      else {
+      } else {
         setErrorFirstName("");
         setErrorLastName("");
         setErrorEmail("");
@@ -53,21 +50,7 @@ const Login = () => {
         dispatch(addUser(res.data.data));
         // return navigate("/profile");
         return navigate("/terms");
-
       }
-
-
-
-
-      // const res = await axios.post(
-      //   BASE_URL + "/signup",
-      //   { firstName, lastName, emailId, password },
-      //   { withCredentials: true }
-      // );
-      // console.log(res.data.data);
-
-      // dispatch(addUser(res.data.data));
-      // return navigate("/profile");
     } catch (err) {
       setError(err?.response?.data || "Something went wrong");
     }
@@ -83,9 +66,7 @@ const Login = () => {
       if (!password) {
         setErrorPassword("Password required");
         return;
-      }
-
-      else {
+      } else {
         setErrorEmail("");
         setErrorPassword("");
         const res = await axios.post(
@@ -99,19 +80,7 @@ const Login = () => {
         dispatch(addUser(res.data));
         setLoginStatus("success");
         return navigate("/");
-
       }
-
-      // const res = await axios.post(
-      //   BASE_URL + "/login",
-      //   {
-      //     emailId,
-      //     password,
-      //   },
-      //   { withCredentials: true }
-      // );
-      // dispatch(addUser(res.data));
-      // return navigate("/");
     } catch (err) {
       setLoginStatus("error");
       setError(err?.response?.data || "Something went wrong");
@@ -144,7 +113,9 @@ const Login = () => {
                     }
                   }}
                 />
-                {errorFirstName && <p style={{ color: "red" }}>{errorFirstName}</p>}
+                {errorFirstName && (
+                  <p style={{ color: "red" }}>{errorFirstName}</p>
+                )}
               </label>
 
               <label className="form-control w-full max-w-xs my-2">
@@ -164,7 +135,9 @@ const Login = () => {
                     }
                   }}
                 />
-                {errorLastName && <p style={{ color: "red" }}>{errorLastName}</p>}
+                {errorLastName && (
+                  <p style={{ color: "red" }}>{errorLastName}</p>
+                )}
               </label>
             </>
           )}
@@ -256,7 +229,11 @@ const Login = () => {
             )}
           </div>
 
-          <h3 className={`text-2xl font-semibold mb-2 ${loginStatus === "success" ? "text-green-600" : "text-red-600"}`}>
+          <h3
+            className={`text-2xl font-semibold mb-2 ${
+              loginStatus === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {loginStatus === "success" ? "Login Successful" : "Login Failed"}
           </h3>
 
@@ -280,8 +257,6 @@ const Login = () => {
           </div>
         </div>
       </div>
-
-
     </div>
   );
 };
