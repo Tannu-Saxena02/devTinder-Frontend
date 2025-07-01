@@ -24,6 +24,7 @@ import { SiAuthentik } from "react-icons/si";
 import { VscGraphLine } from "react-icons/vsc";
 import { FaGlobeAfrica } from "react-icons/fa";
 import Footer from "./Footer";
+import {useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -184,12 +185,14 @@ const LandingPage = () => {
           src={chatdev}
           alt=""
         />
-        <div style={{ fontSize: 47, fontWeight: "bold", marginBlock: 1 }}>
+        <div 
+        className="text-[26px] sm:text-[33px] md:text-[40px] lg:text-[47px]"
+        style={{fontWeight: "bold", marginBlock: 1 }}>
           Design. Chat. Connect.
         </div>
         <div
+        className="text-[26px] sm:text-[33px] md:text-[40px] lg:text-[47px]"
           style={{
-            fontSize: 47,
             fontWeight: "bold",
             marginBlock: 1,
             color: "#feba00",
@@ -198,8 +201,8 @@ const LandingPage = () => {
           Start Experiencing Today
         </div>
         <div
+        className="text-[10px] sm:text-[12px] md:text-[13px] lg:text-[15px]"
           style={{
-            fontSize: 15,
             marginBlock: "1%",
             justifyContent: "center",
             textAlign: "center",
@@ -212,25 +215,26 @@ const LandingPage = () => {
           end-to-end encrypted. Just smooth UI/UX and a seamless experience. 💙
         </div>
         <div
+         className="text-[10px] sm:text-[12px] md:text-[13px] lg:text-[15px] p-[10px] sm:p-[12px] md:p-[13px] lg:p-[15px]"
           style={{
-            fontSize: 15,
             borderWidth: 2,
             borderColor: "#573eb7",
-            padding: 15,
             paddingInline: 30,
             borderRadius: 7,
             fontWeight: "bold",
             background: "blue",
             marginBlock: "2%",
           }}
+          onClick={()=>{
+             Navigate("/login");
+          }}
         >
           Getting Started
         </div>
       </div>
       <div
-        className="flex flex-col items-center justify-center"
+        className="flex flex-col items-center justify-center text-[23px] sm:text-[25px] md:text-[30px] lg:text-[37px]"
         style={{
-          fontSize: 37,
           fontWeight: "bold",
           marginTop: 70,
           marginBottom: 20,
@@ -246,7 +250,7 @@ const LandingPage = () => {
               key={card.id}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
-              className="flex flex-col items-center justify-center"
+              className="flex flex-col items-center justify-center w-[90%] sm:w-[50%] md:w-[45%] lg:w-[23%]"
               style={{
                 border: "2px dashed #573eb7",
                 borderRadius: 12,
@@ -254,7 +258,6 @@ const LandingPage = () => {
                 background: isActive
                   ? "rgb(19, 9, 80)"
                   : "linear-gradient(180deg, #24126A 0%,rgb(19, 9, 80) 100%)",
-                width: "23%",
                 marginInline: "30px",
                 height: isActive ? "340px" : "320px",
                 margin: "10px",
@@ -272,9 +275,9 @@ const LandingPage = () => {
                 </div>
               </div>
               <div
+              className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[24px]"
                 style={{
                   color: "#ffffff",
-                  fontSize: "24px",
                   fontWeight: "bold",
                   textAlign: "center",
                 }}
@@ -282,10 +285,9 @@ const LandingPage = () => {
                 {card.topic}
               </div>
               <div
-                className="m-4"
+                className="m-4 text-[10px] sm:text-[12px] md:text-[14px] lg:text-[14px]"
                 style={{
                   color: "#ffffff",
-                  fontSize: "14px",
                   fontWeight: "bold",
                   textAlign: "center",
                 }}
@@ -313,14 +315,13 @@ const LandingPage = () => {
         {caarouselData.map((card, index) => (
           <div
             key={card.id}
-            className=""
+            className="w-[320px] sm:w-[440px] md:w-[480px] lg:w-[520px]"
             style={{
               justifyContent: "center",
               alignItems: "center",
               display: "inline-block",
               verticalAlign: "top",
               flex: "0 0 auto", // Don't shrink or wrap
-              width: "520px",
               margin: "10px",
               textAlign: "center",
             }}
@@ -329,16 +330,16 @@ const LandingPage = () => {
               <div className="rounded-full flex items-center justify-center bg-[#29235C]"> */}
             <img
               src={card.img}
-              style={{ width: "520px", height: "250px", borderRadius: "5px" }}
+               className="w-[320px] sm:w-[440px] md:w-[480px] lg:w-[520px] h-[140px] sm:h-[180px] md:h-[210px] lg:h-[250px]"
+              style={{  borderRadius: "5px" }}
               alt=""
             />
             {/* </div>
             </div> */}
             <div
-              className="m-4"
+               className="m-4 text-[10px] sm:text-[12px] md:text-[14px] lg:text-[14px]"
               style={{
                 color: "#ffffff",
-                fontSize: "14px",
                 fontWeight: "bold",
                 textAlign: "center",
                 width: "100%",
@@ -353,8 +354,8 @@ const LandingPage = () => {
         ))}
       </div>
       <div
+      className="text-[23px] sm:text-[25px] md:text-[30px] lg:text-[37px]"
         style={{
-          fontSize: 37,
           fontWeight: "bold",
           marginBlock: 30,
           color: "#7b72bf",
@@ -366,8 +367,8 @@ const LandingPage = () => {
       </div>
       <div style={{ marginInline: "15%" }}>
         <div
+        className="text-[21px] sm:text-[23px] md:text-[28px] lg:text-[35px]"
           style={{
-            fontSize: 27,
             fontWeight: "bold",
             marginBlock: 15,
             color: "#32a7ff",
@@ -376,7 +377,9 @@ const LandingPage = () => {
           {" "}
           Our Mission
         </div>
-        <div style={{ fontSize: 17, marginBlock: 10, marginBottom: 40 }}>
+        <div 
+        className="text-[13px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
+        style={{ marginBlock: 10, marginBottom: 40 }}>
           At DevConnect, our mission is to redefine how people connect,
           communicate, and collaborate — through a fast, secure, and
           user-centric messaging platform. We aim to empower individuals, teams,
@@ -388,8 +391,8 @@ const LandingPage = () => {
           always effortless and secure.
         </div>
         <div
+        className="text-[21px] sm:text-[23px] md:text-[28px] lg:text-[35px]"
           style={{
-            fontSize: 27,
             fontWeight: "bold",
             marginBlock: 15,
             color: "#32a7ff",
@@ -397,7 +400,9 @@ const LandingPage = () => {
         >
           Our Value
         </div>
-        <div style={{ fontSize: 17, marginBottom: 90 }}>
+        <div 
+        className="text-[13px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
+        style={{ marginBottom: 90 }}>
           At the heart of our chat application lies a commitment to simplicity,
           privacy, and real-time connection. We believe communication should be
           seamless, secure, and accessible to everyone. That’s why we’ve built a
@@ -410,6 +415,7 @@ const LandingPage = () => {
         </div>
       </div>
       <div
+      className="text-[23px] sm:text-[25px] md:text-[30px] lg:text-[37px]"
         style={{
           fontSize: 37,
           fontWeight: "bold",
@@ -431,12 +437,11 @@ const LandingPage = () => {
               key={id}
               onMouseEnter={() => setTouchedIndex(index)}
               onMouseLeave={() => setTouchedIndex(null)}
-              className="flex flex-col items-center justify-center"
+              className="flex flex-col items-center justify-center  w-[90%] sm:w-[50%] md:w-[45%] lg:w-[20%]"
               style={{
                 border: "1px solid #feba00",
                 borderRadius: 12,
                 padding: 24,
-                width: "20%",
                 height: isActive ? "310px" : "290px",
                 margin: "10px",
                 // transition: "all 0.3s ease-in-out",

@@ -139,3 +139,11 @@ try_files $uri $uri/ =404;
 
 
 diffulcities: online status,used redux in theme?
+
+text-[14px] → applies on all screens (including mobile)
+
+sm:text-[16px] → overrides on screens ≥ 640px (small devices & up)
+
+md:text-[18px] → overrides on screens ≥ 768px (medium devices & up)
+
+lg:text-[20px] → overrides on screens ≥ 1024px (large devices & up)

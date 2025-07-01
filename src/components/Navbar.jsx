@@ -53,9 +53,8 @@ const Navbar = () => {
           <div className="flex gap-2 mx-5 justify-center">
             <Link className="justify-between" to="/login">
               <div
-                className="mx-5"
+                className="mx-5 text-[14px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
                 style={{
-                  fontSize: 17,
                   fontWeight: "500",
                   color: "#ffffff",
                 }}
@@ -68,8 +67,8 @@ const Navbar = () => {
             </Link>
             <Link className="justify-between" to="/signup">
               <div
-                className="mx-5"
-                style={{ fontSize: 17, fontWeight: "400", color: "#ffffff" }}
+                className="text-[14px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
+                style={{ fontWeight: "400", color: "#ffffff" }}
                 onnclick={() => {
                   navigate("/login");
                 }}
