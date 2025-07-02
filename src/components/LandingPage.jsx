@@ -30,6 +30,7 @@ const LandingPage = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [touchedIndex, setTouchedIndex] = useState(null);
   const scrollContainerRef = useRef(null);
+  const navigate = useNavigate();
   const cardData = [
     {
       id: 1,
@@ -226,7 +227,7 @@ const LandingPage = () => {
             marginBlock: "2%",
           }}
           onClick={()=>{
-             Navigate("/login");
+             navigate("/login");
           }}
         >
           Getting Started

@@ -39,7 +39,7 @@ const Requests = () => {
 
   return (
     <div className="text-center my-10">
-      <h1 className="text-bold text-white text-3xl flex justify-center ">
+      <h1 className="text-bold text-white text-3xl flex justify-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]">
         Connection Requests
       </h1>
 
@@ -50,25 +50,25 @@ const Requests = () => {
         return (
           <div
             key={_id}
-            className="flex  items-center m-4 p-4 rounded-lg bg-base-300 w-2/3 mx-auto"
+            className="flex  items-center m-4 p-4 rounded-lg bg-base-300 w-[80%] sm:w-[65%] md:w-[75%] lg:w-[65%] mx-auto"
           >
             <div>
               <img
                 alt="photo"
-                className="w-20 h-20 rounded-full"
+                className="rounded-full w-[110px] h-[60px] sm:w-[25px] sm:h-[80px] md:w-[75px] md:h-[60px] lg:w-[115px] lg:h-[115px]"
                 src={photoUrl}
               />
             </div>
             <div className="text-left mx-6">
-              <h2 className="font-bold text-xl">
+              <div className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]">
                 {firstName + " " + lastName}
-              </h2>
-              {age && gender && <p>{age + ", " + gender}</p>}
-              <p>{about}</p>
+              </div>
+              {age && gender && <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]">{age + ", " + gender}</div>}
+              <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]">{about}</div>
             </div>
             <div className="flex ml-auto">
-              <button className="btn btn-primary mx-2"  onClick={() => reviewRequest("rejected", requests._id)}>Reject</button>
-              <button className="btn btn-secondary mx-2"  onClick={() => reviewRequest("accepted", requests._id)}>Accept</button>
+              <button className="btn btn-primary mx-1 px-2 py-1 text-xs sm:px-2 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base"  onClick={() => reviewRequest("rejected", requests._id)}>Reject</button>
+              <button className="btn btn-secondary mx-1 px-2 py-1 text-xs sm:px-2 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base"  onClick={() => reviewRequest("accepted", requests._id)}>Accept</button>
             </div>
           </div>
         );

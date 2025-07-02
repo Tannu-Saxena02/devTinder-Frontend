@@ -52,13 +52,14 @@ success & error dialog show on otp send & on api error
 Goggle auth Implementation
 
 
-Drawer Implementation
+
 front page for UI  (almost)
+APP ICON and NAME (done)
 change and forgot password api & UI
 Light & dark mode
 
 beautify Ui and responsiveness
-APP ICON and NAME (done)
+Drawer Implementation(later)
 AI Asistant for FAQ
 
  TODO backend:

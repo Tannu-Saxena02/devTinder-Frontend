@@ -17,6 +17,7 @@ import Chat from "./components/Chat";
 import OtpVerification from "./components/OtpVerification";
 import Privacy from "./components/privacy";
 import LandingPage from "./components/LandingPage";
+import Signup from "./components/Signup";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -25,12 +26,13 @@ function App() {
       <Provider store={appStore}>
         <BrowserRouter basename="/">
           <Routes>
-            <Route path="/feed" element={<Feed />} />
             <Route path="/" element={<Body />}>
               <Route index element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
+                 <Route path="/signup" element={<Signup />} />
               <Route path="/connections" element={<Connections />} />
               <Route path="/requests" element={<Requests />} />
+              <Route path="/feed" element={<Feed />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />

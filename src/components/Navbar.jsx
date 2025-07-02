@@ -8,6 +8,10 @@ import applogo from "../assets/chatdev.png"; // Assuming you have a logo image
 import { addTheme } from "../utils/themeSlice";
 import { MdDarkMode } from "react-icons/md";
 import { MdLightMode } from "react-icons/md";
+import { IoLogOutOutline } from "react-icons/io5";
+import { FaUserEdit } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
+import { TbUsersPlus } from "react-icons/tb";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
@@ -58,7 +62,7 @@ const Navbar = () => {
                   fontWeight: "500",
                   color: "#ffffff",
                 }}
-                onnclick={() => {
+                onClick={() => {
                   navigate("/login");
                 }}
               >
@@ -69,8 +73,8 @@ const Navbar = () => {
               <div
                 className="text-[14px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
                 style={{ fontWeight: "400", color: "#ffffff" }}
-                onnclick={() => {
-                  navigate("/login");
+                onClick={() => {
+                  navigate("/signup");
                 }}
               >
                 Sign Up
@@ -105,25 +109,34 @@ const Navbar = () => {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
               >
                 <li>
-                  <Link className="justify-between" to="/profile">
-                    Profile
-                    <span className="badge">New</span>
+                  <Link  to="/profile">
+                  <FaUserEdit size={20}/>
+                    <div style={{fontSize:14}}>Profile</div>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/connections">Connections</Link>
+                  <Link to="/connections">
+                  <FaUsers size={20}/>
+                  <div style={{fontSize:14}}>Connections</div>
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/requests">Requests</Link>
+                  <Link to="/requests">
+                  <TbUsersPlus size={20}/>
+                  <div style={{fontSize:14}}>Requests</div>
+                  </Link>
                 </li>
                 <li>
                   <div onClick={toggleTheme}>
-                    {theme === "dark" ? <MdDarkMode /> : <MdLightMode />}
-                    {theme === "dark" ? "Dark Mode" : "Light Mode"}
+                    {theme === "dark" ? <MdDarkMode size={20}/> : <MdLightMode size={20}/>}
+                    <div style={{fontSize:14}}>{theme === "dark" ? "Dark Mode" : "Light Mode"}</div>
                   </div>
                 </li>
                 <li>
-                  <Link onClick={handleLogout}>Logout</Link>
+                  <Link onClick={handleLogout}>
+                  <IoLogOutOutline size={20} />
+                  <div style={{fontSize:14}}>Logout</div>
+                  </Link>
                 </li>
               </ul>
             </div>
