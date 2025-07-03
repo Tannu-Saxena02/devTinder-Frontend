@@ -50,7 +50,8 @@ sendotp & verify & google api implementation
 success & error dialog show on otp send & on api error
 
 Goggle auth Implementation
-
+validation in profile & on about (40 words)
+api validation api will hit only success validation
 
 
 front page for UI  (almost)

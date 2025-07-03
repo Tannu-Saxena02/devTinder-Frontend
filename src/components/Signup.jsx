@@ -18,29 +18,38 @@ const Signup = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  function validationFields() {
+    let isValid = true;
+    if (!firstName) {
+      setErrorFirstName("First Name is required");
+      isValid = false;
+    } else {
+      setErrorFirstName("");
+    }
+    if (!lastName) {
+      setErrorLastName("Last Name is required");
+      isValid = false;
+    } else {
+      setErrorLastName("");
+    }
+    if (!emailId) {
+      setErrorEmail("Email Id is required");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(emailId)) {
+      setErrorEmail("Email Id format is invalid");
+      isValid = false;
+    } else setErrorEmail("");
+    if (!password) {
+      setErrorPassword("Password is required");
+      isValid = false;
+    } else {
+      setErrorPassword("");
+    }
+    return isValid;
+  }
   const handleSignUp = async () => {
     try {
-      if (!firstName) {
-        setErrorFirstName("First Name is required");
-      }
-      if (!lastName) {
-        setErrorLastName("Last Name is required");
-      }
-      if (!/\S+@\S+\.\S+/.test(emailId)) {
-        setErrorEmail("Email Id format is invalid");
-      }
-      if (!emailId) {
-        setErrorEmail("Email Id is required");
-      }
-      if (!password) {
-        setErrorPassword("Password is required");
-      } else {
-        setErrorFirstName("");
-        setErrorLastName("");
-        setErrorEmail("");
-        setErrorPassword("");
-
+      if (validationFields()) {
         const res = await axios.post(
           BASE_URL + "/signup",
           { firstName, lastName, emailId, password },
@@ -67,19 +76,19 @@ const Signup = () => {
               First Name
             </div>
             <input
-                type="text"
-                value={firstName}
-                className={`input input-bordered w-full max-w-xs `}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setFirstName(val);
+              type="text"
+              value={firstName}
+              className={`input input-bordered w-full max-w-xs `}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFirstName(val);
 
-                  if (val.trim() !== "") {
-                    setErrorFirstName("");
-                  }
-                }}
-              />
-     
+                if (val.trim() !== "") {
+                  setErrorFirstName("");
+                }
+              }}
+            />
+
             {errorFirstName && (
               <p style={{ color: "red", fontSize: 11 }}>{errorFirstName}</p>
             )}
@@ -113,9 +122,13 @@ const Signup = () => {
               onChange={(e) => {
                 const val = e.target.value;
                 setEmailId(val);
-                if (/\S+@\S+\.\S+/.test(val)) {
-                  setErrorEmail("");
+                if (!val || !val.trim()) {
+                  setErrorEmail("Email Id is required");
+                } else if (!/\S+@\S+\.\S+/.test(val)) {
+                  setErrorEmail("Email Id format is invalid");
                 }
+                else
+                 setErrorEmail("")
               }}
               className="input"
             />

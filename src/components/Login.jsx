@@ -18,17 +18,30 @@ const Login = () => {
   const navigate = useNavigate();
 
   // for error
+  function validationFields() {
+    let isValid = true;
+    console.log("data " + emailId + " " + password);
 
+    if (!emailId || !emailId.trim()) {
+      console.log("in email");
+
+      setErrorEmail("Email ID is required");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(emailId)) {
+      setErrorEmail("Email Id format is invalid");
+      isValid = false;
+    } else setErrorEmail("");
+    if (!password) {
+      setErrorPassword("Password is required");
+      isValid = false;
+    } else setErrorPassword("");
+    return isValid;
+  }
   const handleLogin = async () => {
+    console.log("clicked");
+
     try {
-      if (!emailId) {
-        setErrorEmail("Email ID is required");
-      }
-      if (!password) {
-        setErrorPassword("Password is required");
-      } else {
-        setErrorEmail("");
-        setErrorPassword("");
+      if (validationFields()) {
         const res = await axios.post(
           BASE_URL + "/login",
           {
@@ -43,13 +56,15 @@ const Login = () => {
       }
     } catch (err) {
       setLoginStatus("error");
-      setError(err?.response?.data || "Something went wrong");
+      setError("ERROR " + err?.response?.data || "Something went wrong");
     }
   };
   return (
     <div className="flex justify-center my-10">
-      <div className="card bg-base-300  shadow-sm w-76 sm:w-85 md:w-90 lg:w-96 xl:w-[380px]
-">
+      <div
+        className="card bg-base-300  shadow-sm w-76 sm:w-85 md:w-90 lg:w-96 xl:w-[380px]
+"
+      >
         <div className="card-body">
           <h2 className="card-title justify-center">Login</h2>
 
@@ -61,9 +76,11 @@ const Login = () => {
               onChange={(e) => {
                 const val = e.target.value;
                 setEmailId(val);
-                if (/\S+@\S+\.\S+/.test(val)) {
-                  setErrorEmail("");
-                }
+                if (!val || !val.trim()) {
+                  setErrorEmail("Email Id is required");
+                } else if (!/\S+@\S+\.\S+/.test(val)) {
+                  setErrorEmail("Email Id format is invalid");
+                } else setErrorEmail("");
               }}
               className="input"
             />
@@ -91,10 +108,11 @@ const Login = () => {
           </fieldset>
           <p className="text-red-500">{error}</p>
           <div className="card-actions justify-center my-2">
-            <div 
-
-            className="btn btn-primary w-63 sm:w-68 md:w-75 lg:w-80" onClick={handleLogin}>
-              Sign Up
+            <div
+              className="btn btn-primary w-63 sm:w-68 md:w-75 lg:w-80"
+              onClick={handleLogin}
+            >
+              Sign In
             </div>
           </div>
           <p

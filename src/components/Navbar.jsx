@@ -12,6 +12,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { FaUserEdit } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa";
 import { TbUsersPlus } from "react-icons/tb";
+import { VscFeedback } from "react-icons/vsc";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
@@ -106,8 +107,14 @@ const Navbar = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+                className="menu menu-sm dropdown-content bg-base-300 rounded-box z-1 mt-3 w-52 p-2 shadow"
               >
+                <li>
+                  <Link  to="/feed">
+                  <VscFeedback size={20}/>
+                    <div style={{fontSize:14}}>User feed</div>
+                  </Link>
+                </li>
                 <li>
                   <Link  to="/profile">
                   <FaUserEdit size={20}/>

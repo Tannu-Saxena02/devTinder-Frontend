@@ -6,7 +6,7 @@ import { removeUserFromFeed } from "../utils/feedSlice";
 
 const UserCard = ({ user }) => {
   const { _id, firstName, lastName, photoUrl, age, gender, about } = user;
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
   const handleSendRequest = async (status, userId) => {
     try {
       const res = await axios.post(
@@ -17,20 +17,30 @@ const UserCard = ({ user }) => {
       dispatch(removeUserFromFeed(userId));
     } catch (err) {
       console.log(err);
-      
     }
-
   };
   return (
-    <div className="card bg-base-300 w-80 sm:w-[60] md:w-[80] lg:w-[96] shadow-sm flex justify-center">
-      <figure>
-        <img src={photoUrl} alt="photo" />
-      </figure>
-      <div className="card-body">
-        <h2 className="card-title">{firstName + " " + lastName}</h2>
-        {age && gender && <p>{age + " , " + gender}</p>}
-        <p>{about}</p>
-        <div className="card-actions flex justify-center my-4">
+    <div className="bg-base-300 w-90 sm:w-[60] md:w-[80] lg:w-[106] shadow-sm flex flex-col mx-auto rounded-md">
+      {/* <figure> */}
+        <img
+          src={photoUrl}
+          className="h-auto w-full rounded-md"
+          alt="photo"
+        />
+
+      <div className="m-4 flex flex-col flex-1">
+        <div className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]">
+          {firstName + " " + lastName}
+        </div>
+        {age && gender && (
+          <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]">
+            {age + " , " + gender}
+          </div>
+        )}
+        <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px] my-2">
+          {about}
+        </div>
+        <div className="card-actions flex justify-center mt-auto">
           <button
             className="btn btn-primary"
             onClick={() => handleSendRequest("ignored", _id)}
