@@ -1,14 +1,22 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
 import { Link } from "react-router-dom";
+import Dialog from "../utils/Dialog";
 
 const Connections = () => {
   const connections = useSelector((store) => store.connections);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
+  const [dialog, setDialog] = useState({
+        status: false,
+        isOpen: false,
+        title: "",
+        message: "",
+        onClose: null,
+      });
   const fetchConnections = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/connections", {
@@ -19,9 +27,18 @@ const Connections = () => {
       dispatch(addConnections(res?.data?.data));
     } catch (err) {
       console.log("ERROR " + err.data);
+       setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.data?.message,
+          onClose: closeDialog,
+        });
     }
   };
-
+   const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
+  };
   useEffect(() => {
     fetchConnections();
   }, []);
@@ -104,6 +121,15 @@ const Connections = () => {
           </div>
         );
       })}
+       {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
     </div>
   );
 };

@@ -1,13 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useSelector, useDispatch } from "react-redux";
 const Terms = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const termsRef = useRef(null);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
-
+  const theme = useSelector((state) => state.theme);
+  const isterms = useSelector((state) => state.isterms);
   const handleAccept = () => {
-    navigate("/profile");
+    navigate("/privacy");
   };
 
   const scrollToBottom = () => {
@@ -19,38 +21,34 @@ const Terms = () => {
     }
   };
 
-  const handleScroll = () => {
-    const container = termsRef.current;
-    if (!container) return;
-
-    const isBottom =
-      container.scrollTop + container.clientHeight >=
-      container.scrollHeight - 10;
-
-    setIsScrolledToBottom(isBottom);
-  };
-
   useEffect(() => {
-    const container = termsRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
-    }
+     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="w-full  flex justify-center items-center bg-gradient-to-br from-base-100 to-base-200 px-2 ">
-      <div className="card w-full max-w-7xl bg-white  p-6">
-        <div className="flex justify-center items-center ">
-          {/* <h2 className="card-title text-3xl font-semibold text-center mb-4  "> */}
-          <h2 className="text-4xl font-bold text-center">Terms & Conditions</h2>
+    <div
+      className="w-full  flex justify-center items-center px-2"
+      style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
+    >
+      <div
+        className={`card w-full max-w-7xl  p-6`}
+        style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#DBDBDB" }}
+      >
+        <div className="flex justify-center items-center">
+          <h2
+            className="text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px] font-bold text-center"
+            style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+          >
+            Terms & Conditions
+          </h2>
         </div>
-        {/* Scrollable Content - 50% of the viewport height */}
         <div
           ref={termsRef}
-          className="overflow-y-auto w-full h-[50vh]  p-4 bg-base-100 text-base text-gray-700 leading-relaxed"
+          className={`overflow-y-auto w-full  p-4 text-base text-gray-700 leading-relaxed`}
+          style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#DBDBDB" }}
         >
-          <p>
+          <div style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+          className="text-[10px] sm:text-[10px] md:text-[13px] lg:text-[14px]">
             Welcome! Before using our platform, please review our Terms and
             Conditions. By proceeding, you agree to comply with and be bound by
             the following terms...
@@ -106,7 +104,10 @@ const Terms = () => {
             <br /> <br />
             <hr /> <br />
             <br />
-            <strong>2. INFORMATION WE COLLECT:</strong>
+            <strong>
+              2. INFORMATION WE COLLECT:
+              <br />
+            </strong>
             We may collect both personal and non-personal identifiable
             information from You in a variety of ways, including, but not
             limited to, when You visit our Platform, register on the Platform,
@@ -119,7 +120,7 @@ const Terms = () => {
             services, or protect our rights. We do not store Personal
             Information on our servers unless required for the on-going
             operation of our Platform.
-            <br />
+            <br /> <br />
             <strong> a. Personal Identifiable Information:</strong> <br />
             We may collect personal-identifiable information such as Your name
             and emails address to enable Your access to the Platform and
@@ -129,13 +130,13 @@ const Terms = () => {
             provide such personal identification information; however, it may
             prevent You from accessing services or products provided on the
             Platform or from engaging in certain activities on the Platform.{" "}
-            <br />
+            <br /> <br />
             <strong> b. Non-Personal Identifiable Information:</strong> <br />
             When You interact with our Platform, we may collect
             non-personal-identifiable information such as the browser name,
             language preference, referring site, and the date and time of each
             user request, operating system and the Internet service providers
-            utilized and other similar information. <br />
+            utilized and other similar information. <br /> <br />
             <strong>c. Cookies:</strong> <br />
             To enhance User experience, our Platform may use 'cookies'. A cookie
             is a string of information that a website stores on a visitor’s
@@ -146,30 +147,33 @@ const Terms = () => {
             some parts of the Platform may not function properly.
             <br /> <br />
             Thank you for being a valued user!
-          </p>
+          </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex justify-between items-center mt-6 gap-4">
-          <button className="btn btn-outline btn-sm" onClick={scrollToBottom}>
-            Scroll to Bottom
-          </button>
+        {isterms=="true" ? (
+          <div>
+            <div className="flex justify-between items-center mt-6 gap-4">
+              <button
+                className="btn btn-outline btn-sm"
+                style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                onClick={scrollToBottom}
+              >
+                Scroll to Bottom
+              </button>
 
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={handleAccept}
-            disabled={!isScrolledToBottom}
-          >
-            {isScrolledToBottom ? "I Agree" : "Scroll to Accept"}
-          </button>
-        </div>
-
-        {/* Hint */}
-        {!isScrolledToBottom && (
-          <p className="text-center text-xs text-red-500 mt-2">
-            You must scroll to the bottom to accept.
-          </p>
-        )}
+              <button
+                className="btn btn-sm"
+                onClick={handleAccept}
+                style={{
+                  color: theme === "dark" ? "#ffffff" : "black",
+                  backgroundColor: "#89C34C",
+                }}
+              >
+                Agree & Continue
+              </button>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import { useDispatch,useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
+import { addTerms } from "../utils/termsSlice";
+import Dialog from "../utils/Dialog";
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -16,6 +18,13 @@ const Signup = () => {
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const theme = useSelector((state) => state.theme);
+  const [dialog, setDialog] = useState({
+        status: false,
+        isOpen: false,
+        title: "",
+        message: "",
+        onClose: null,
+  });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   function validationFields() {
@@ -55,15 +64,24 @@ const Signup = () => {
           { firstName, lastName, emailId, password },
           { withCredentials: true }
         );
-        console.log(res.data.data);
-
+        dispatch(addTerms("true"));
         dispatch(addUser(res.data.data));
-        // return navigate("/profile");
         return navigate("/terms");
       }
     } catch (err) {
-      alert(err?.response?.data || "Something went wrong");
+       setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.data?.message,
+          onClose: closeDialog
+        });
+      // alert(err?.response?.data || "Something went wrong");
+    
     }
+  };
+  const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   return (
     <div className="flex justify-center my-10">
@@ -184,6 +202,15 @@ const Signup = () => {
           </p>
         </div>
       </div>
+       {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
     </div>
   );
 };

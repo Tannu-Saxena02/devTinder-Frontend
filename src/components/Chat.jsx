@@ -7,6 +7,7 @@ import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 import EmojiPicker from "emoji-picker-react";
+import Dialog from "../utils/Dialog";
 
 const Chat = ({ onSend }) => {
   const { targetUserId } = useParams();
@@ -22,6 +23,13 @@ const Chat = ({ onSend }) => {
   const userId = user?._id;
   const messagesEndRef = useRef(null);
   const theme = useSelector((state) => state.theme);
+   const [dialog, setDialog] = useState({
+      status: false,
+      isOpen: false,
+      title: "",
+      message: "",
+      onClose: null,
+    });
   useEffect(() => {
     if (!userId) return;
     const socket = createSocketConnection();
@@ -79,8 +87,17 @@ const Chat = ({ onSend }) => {
       });
       setMessages(chatMessages);
     } catch (error) {
-      alert("ERROR " + error.message);
+       setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.data?.message,
+          onClose: closeDialog,
+        });
     }
+  };
+    const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   const getStatus = async () => {
     try {
@@ -92,7 +109,13 @@ const Chat = ({ onSend }) => {
       );
       setStatus(statusResponse.data);
     } catch (error) {
-      alert("ERROR " + error.message);
+      setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.data?.message,
+          onClose: closeDialog,
+        });
     }
   };
 
@@ -162,7 +185,13 @@ const Chat = ({ onSend }) => {
         currentTime: new Date(),
       });
     } catch (error) {
-      console.error("File upload failed", error);
+       setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: "File upload failed",
+          onClose: closeDialog,
+        });
     }
   };
   const sendMessage = () => {
@@ -359,6 +388,15 @@ const Chat = ({ onSend }) => {
           Send
         </button>
       </div>
+      {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
     </div>
   );
 };

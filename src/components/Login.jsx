@@ -5,6 +5,7 @@ import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import Dialog from "../utils/Dialog";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -14,6 +15,13 @@ const Login = () => {
   const [errorPassword, setErrorPassword] = useState("");
   const [loginStatus, setLoginStatus] = useState(""); // "success", "error"
   const theme = useSelector((state) => state.theme);
+  const [dialog, setDialog] = useState({
+      status: false,
+      isOpen: false,
+      title: "",
+      message: "",
+      onClose: null,
+    });
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -55,9 +63,20 @@ const Login = () => {
         return navigate("/feed");
       }
     } catch (err) {
-      setLoginStatus("error");
-      setError("ERROR " + err?.response?.data || "Something went wrong");
+      // setLoginStatus("error");
+      // setError("ERROR " + err?.response?.data || "Something went wrong");
+      //  console.log(err);      
+       setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.data?.message,
+          onClose: closeDialog
+        });
     }
+  };
+    const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   return (
     <div className="flex justify-center my-10">
@@ -199,6 +218,15 @@ const Login = () => {
           </div>
         </div>
       </div>
+       {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
     </div>
   );
 };

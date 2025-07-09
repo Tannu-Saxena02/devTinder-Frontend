@@ -11,13 +11,13 @@ import { Provider } from "react-redux";
 import appStore from "./utils/appStore";
 import Feed from "./components/Feed";
 import Connections from "./components/Connections";
-import Requests from "./components/Requests";
 import Terms from "./components/Terms";
 import Chat from "./components/Chat";
 import OtpVerification from "./components/OtpVerification";
-import Privacy from "./components/privacy";
+import Privacy from "./components/Privacy";
 import LandingPage from "./components/LandingPage";
 import Signup from "./components/Signup";
+import Requests from "./components/requests";
 
 function App() {
   const [count, setCount] = useState(0);

@@ -91,7 +91,7 @@ const Navbar = () => {
         {user && (
           <div className="flex gap-2 mx-5 justify-center">
             <div
-              className="form-control justify-center mx-3 my-2 "
+              className="form-control justify-center mx-3 my-2 text-[10px] sm:text-[10px] md:text-[13px] lg:text-[17px]"
               style={{
                 color: theme === "dark" ? "#ffffff" : "black",
                 fontWeight: "500",

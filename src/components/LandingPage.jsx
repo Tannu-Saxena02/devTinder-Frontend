@@ -229,7 +229,8 @@ const LandingPage = () => {
             fontWeight: "bold",
             background: "blue",
             marginBlock: "2%",
-          }}
+            cursor: "pointer"
+          }}      
           onClick={()=>{
              navigate("/login");
           }}

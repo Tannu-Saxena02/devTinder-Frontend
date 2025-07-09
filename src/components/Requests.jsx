@@ -1,13 +1,21 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { addRequests,removeRequests } from "../utils/requestSlice";
+import Dialog from "../utils/Dialog";
 
 const Requests = () => {
   const requests = useSelector((store) => store.requests);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
+  const [dialog, setDialog] = useState({
+        status: false,
+        isOpen: false,
+        title: "",
+        message: "",
+        onClose: null,
+  });
   const fetchRequests = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/requests/received", {
@@ -17,6 +25,13 @@ const Requests = () => {
       dispatch(addRequests(res?.data?.data));
     } catch (err) {
       console.log("ERROR " + err.data);
+       setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.data?.message,
+          onClose: closeDialog,
+        });
     }
   };
 
@@ -24,6 +39,9 @@ const Requests = () => {
     fetchRequests();
   }, []);
 
+  const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
+  };
    const reviewRequest = async (status, _id) => {
     try {
       const res = axios.post(
@@ -32,7 +50,15 @@ const Requests = () => {
         { withCredentials: true }
       );
       dispatch(removeRequests(_id));
-    } catch (err) {}
+    } catch (err) {
+       setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.data?.message,
+          onClose: closeDialog,
+        });
+    }
   };
   if (!requests) return;
 
@@ -80,6 +106,15 @@ const Requests = () => {
           </div>
         );
       })}
+       {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
     </div>
   );
 };

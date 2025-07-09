@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch,useSelector } from "react-redux";
@@ -7,6 +7,13 @@ import { removeUserFromFeed } from "../utils/feedSlice";
 const UserCard = ({ user }) => {
   const { _id, firstName, lastName, photoUrl, age, gender, about } = user;
   const theme = useSelector((state) => state.theme);
+   const [dialog, setDialog] = useState({
+      status: false,
+      isOpen: false,
+      title: "",
+      message: "",
+      onClose: null,
+    });
   const dispatch = useDispatch();
   const handleSendRequest = async (status, userId) => {
     try {
@@ -17,8 +24,17 @@ const UserCard = ({ user }) => {
       );
       dispatch(removeUserFromFeed(userId));
     } catch (err) {
-      console.log(err);
+       setDialog({
+        status: false,
+        isOpen: true,
+        title: "Error",
+        message: err.response.data,
+        onClose: closeDialog,
+      });
     }
+  };
+    const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   return (
     <div className="bg-base-300 w-90 sm:w-[60] md:w-[80] lg:w-[106] shadow-sm flex flex-col mx-auto rounded-md"
@@ -60,6 +76,15 @@ const UserCard = ({ user }) => {
           </button>
         </div>
       </div>
+         {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
     </div>
   );
 };
