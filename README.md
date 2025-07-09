@@ -40,24 +40,22 @@ ROute=/login=>Login
 Route=/connections=>Connections
 Router=/profile=>Profile
 
-TODO for frontend:
-validation on field and add dropdown
-Error handling on API frontend
+# TODO for frontend:
+validation on field and add dropdown (done)
+Error handling on API frontend (mostly done)
+validation in profile & on about (40 words) (done)
+api validation api will hit only success validation(done)
+front page for UI  (almost)
+APP ICON and NAME (done)
+
 Terms and condition -black page issue
 Privacy policy page -black page issue
 OTP screen and verify otp screen -timer 30sec & resend-30sec -black page issue
 sendotp & verify & google api implementation 
 success & error dialog show on otp send & on api error
-
 Goggle auth Implementation
-validation in profile & on about (40 words)
-api validation api will hit only success validation
-
-
-front page for UI  (almost)
-APP ICON and NAME (done)
 change and forgot password api & UI
-Light & dark mode
+Light & dark mode(remaining for some screens)
 
 beautify Ui and responsiveness
 Drawer Implementation(later)
@@ -65,12 +63,13 @@ AI Asistant for FAQ
 
  TODO backend:
 validation and code correction backend(testing)
+payment gateway 
+
 otp Send API & verify otp API (done)
 : https://dev.to/manthanank/building-an-otp-verification-system-with-nodejs-and-mongodb-2p0o
 - read about SMTP server and how it work with send mail
 Goggle auth API (done)
 deployment  (done)
-payment gateway 
 chat Feature. (done)
 
 # Deployment

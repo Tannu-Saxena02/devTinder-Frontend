@@ -25,11 +25,13 @@ import { VscGraphLine } from "react-icons/vsc";
 import { FaGlobeAfrica } from "react-icons/fa";
 import Footer from "./Footer";
 import {useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux';
 
 const LandingPage = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [touchedIndex, setTouchedIndex] = useState(null);
   const scrollContainerRef = useRef(null);
+  const theme = useSelector((state) => state.theme);
   const navigate = useNavigate();
   const cardData = [
     {
@@ -188,7 +190,7 @@ const LandingPage = () => {
         />
         <div 
         className="text-[26px] sm:text-[33px] md:text-[40px] lg:text-[47px]"
-        style={{fontWeight: "bold", marginBlock: 1 }}>
+        style={{fontWeight: "bold", marginBlock: 1,color: theme === "dark" ? "#ffffff" : "black", }}>
           Design. Chat. Connect.
         </div>
         <div
@@ -202,12 +204,14 @@ const LandingPage = () => {
           Start Experiencing Today
         </div>
         <div
-        className="text-[10px] sm:text-[12px] md:text-[13px] lg:text-[15px]"
+        className="text-[10px] sm:text-[12px] md:text-[13px] lg:text-[17px]"
           style={{
             marginBlock: "1%",
             justifyContent: "center",
             textAlign: "center",
             marginInline: "20%",
+            color: theme === "dark" ? "#ffffff" : "black",
+            fontWeight:"500"
           }}
         >
           Take the leap into modern messaging with our powerful, real-time chat
@@ -239,6 +243,7 @@ const LandingPage = () => {
           fontWeight: "bold",
           marginTop: 70,
           marginBottom: 20,
+          color: theme === "dark" ? "#ffffff" : "black",
         }}
       >
         Our Services & Features
@@ -340,7 +345,7 @@ const LandingPage = () => {
             <div
                className="m-4 text-[10px] sm:text-[12px] md:text-[14px] lg:text-[14px]"
               style={{
-                color: "#ffffff",
+                color: theme === "dark" ? "#ffffff" : "black",
                 fontWeight: "bold",
                 textAlign: "center",
                 width: "100%",
@@ -380,7 +385,7 @@ const LandingPage = () => {
         </div>
         <div 
         className="text-[13px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
-        style={{ marginBlock: 10, marginBottom: 40 }}>
+        style={{ marginBlock: 10, marginBottom: 40,color: theme === "dark" ? "#ffffff" : "black", }}>
           At DevConnect, our mission is to redefine how people connect,
           communicate, and collaborate — through a fast, secure, and
           user-centric messaging platform. We aim to empower individuals, teams,
@@ -403,7 +408,7 @@ const LandingPage = () => {
         </div>
         <div 
         className="text-[13px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
-        style={{ marginBottom: 90 }}>
+        style={{ marginBottom: 90,color: theme === "dark" ? "#ffffff" : "black" }}>
           At the heart of our chat application lies a commitment to simplicity,
           privacy, and real-time connection. We believe communication should be
           seamless, secure, and accessible to everyone. That’s why we’ve built a
@@ -450,13 +455,17 @@ const LandingPage = () => {
                 transform: isActive ? "scale(1.03)" : "scale(1)",
               }}
             >
-              <div className="mb-6 rounded-full flex items-center justify-center bg-gradient-to-b from-purple-600/50 to-indigo-600/40 p-1 shadow-lg">
+              {/* style={{backgroundColor:"#94D292"}} */}
+              {/* from-purple-600/50 to-indigo-600/40 */}
+              <div className="mb-6 rounded-full flex items-center justify-center bg-gradient-to-b from-purple-600/50 to-indigo-600/40  p-1 shadow-lg"
+              >
                 <div
                   className="rounded-full flex items-center justify-center bg-[#29235C]"
-                  style={{ height: 100, width: 100 }}
+                  style={{ height: 100, width: 100 ,}}
                 >
+                  {/* backgroundColor:theme=== "dark" ?"29235C":"#D0E2EA" */}
                   <IconComponent
-                    color="blue"
+                    color={theme === "dark" ? "blue":"#2CA848"}
                     size={30}
                     style={{
                       justifyContent: "center",
@@ -471,7 +480,7 @@ const LandingPage = () => {
               <div
                 className="m-4"
                 style={{
-                  color: "#ffffff",
+                  color: theme === "dark" ? "#ffffff" : "black",
                   fontSize: "12px",
                   fontWeight: "bold",
                   textAlign: "center",

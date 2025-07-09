@@ -6,6 +6,7 @@ import { addFeed } from '../utils/feedSlice';
 import UserCard from './UserCard';
 
 const Feed = () => {
+  const theme = useSelector((state) => state.theme);
   const dispatch=useDispatch();
   const feed=useSelector(store=>store.feed);
   useEffect(()=>{
@@ -27,7 +28,8 @@ const Feed = () => {
   }
   if (!feed) return;
   if (feed.length <= 0)
-    return <h1 className="flex justify-center my-10">No new users founds!</h1>;
+    return <h1 className="flex justify-center my-10"
+     style={{color: theme === "dark" ? "#ffffff" : "black",fontWeight:"500"}}>No new users founds!</h1>;
 
   return (
     feed && (<div className="flex justify-center my-10">

@@ -13,6 +13,7 @@ import { FaUserEdit } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa";
 import { TbUsersPlus } from "react-icons/tb";
 import { VscFeedback } from "react-icons/vsc";
+import { IoHome } from "react-icons/io5";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
@@ -41,7 +42,10 @@ const Navbar = () => {
   };
   return (
     <div>
-      <div className="navbar bg-base-300 shadow-sm">
+      <div
+        className="navbar bg-base-300 shadow-sm"
+        style={{ backgroundColor: theme === "dark" ? "black" : "#ffffff" }}
+      >
         <div className="flex-1">
           <Link className="btn btn-ghost text-xl" to="/">
             <img
@@ -87,8 +91,11 @@ const Navbar = () => {
         {user && (
           <div className="flex gap-2 mx-5 justify-center">
             <div
-              className="form-control justify-center mx-3 my-2"
-              style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+              className="form-control justify-center mx-3 my-2 "
+              style={{
+                color: theme === "dark" ? "#ffffff" : "black",
+                fontWeight: "500",
+              }}
             >
               Welcome, {user.firstName}
             </div>
@@ -108,41 +115,129 @@ const Navbar = () => {
               <ul
                 tabIndex={0}
                 className="menu menu-sm dropdown-content bg-base-300 rounded-box z-1 mt-3 w-52 p-2 shadow"
+                style={{
+                  backgroundColor: theme === "dark" ? "black" : "#ffffff",
+                }}
               >
                 <li>
-                  <Link  to="/feed">
-                  <VscFeedback size={20}/>
-                    <div style={{fontSize:14}}>User feed</div>
+                  <Link to="/">
+                    <IoHome
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color:theme === "dark" ? "#ffffff" : "black"
+                      }}
+                    >
+                      Home
+                    </div>
                   </Link>
                 </li>
                 <li>
-                  <Link  to="/profile">
-                  <FaUserEdit size={20}/>
-                    <div style={{fontSize:14}}>Profile</div>
+                  <Link to="/feed">
+                    <VscFeedback
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      User feed
+                    </div>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/profile">
+                    <FaUserEdit
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      Profile
+                    </div>
                   </Link>
                 </li>
                 <li>
                   <Link to="/connections">
-                  <FaUsers size={20}/>
-                  <div style={{fontSize:14}}>Connections</div>
+                    <FaUsers
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      Connections
+                    </div>
                   </Link>
                 </li>
                 <li>
                   <Link to="/requests">
-                  <TbUsersPlus size={20}/>
-                  <div style={{fontSize:14}}>Requests</div>
+                    <TbUsersPlus
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      Requests
+                    </div>
                   </Link>
                 </li>
                 <li>
                   <div onClick={toggleTheme}>
-                    {theme === "dark" ? <MdDarkMode size={20}/> : <MdLightMode size={20}/>}
-                    <div style={{fontSize:14}}>{theme === "dark" ? "Dark Mode" : "Light Mode"}</div>
+                    {theme === "dark" ?
+                    (
+                      <MdLightMode
+                        size={20}
+                        color={theme === "dark" ? "#ffffff" : "black"}
+                      />
+                    ): (
+                      <MdDarkMode
+                        size={20}
+                        color={theme === "dark" ? "#ffffff" : "black"}
+                      />
+                    ) 
+                    }
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      {theme === "dark" ? "Light Mode":"Dark Mode" }
+                    </div>
                   </div>
                 </li>
                 <li>
                   <Link onClick={handleLogout}>
-                  <IoLogOutOutline size={20} />
-                  <div style={{fontSize:14}}>Logout</div>
+                    <IoLogOutOutline
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      Logout
+                    </div>
                   </Link>
                 </li>
               </ul>

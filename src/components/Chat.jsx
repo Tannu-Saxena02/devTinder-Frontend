@@ -21,7 +21,7 @@ const Chat = ({ onSend }) => {
   const user = useSelector((store) => store.user);
   const userId = user?._id;
   const messagesEndRef = useRef(null);
-
+  const theme = useSelector((state) => state.theme);
   useEffect(() => {
     if (!userId) return;
     const socket = createSocketConnection();
@@ -198,19 +198,20 @@ const Chat = ({ onSend }) => {
         </div>
         <div className="flex flex-col">
           {status.firstName && status.lastName && (
-            <div>{status.firstName + " " + status.lastName}</div>
+            <div style={{ color: theme === "dark" ? "#ffffff" : "black",fontWeight:"500"}}>{status.firstName + " " + status.lastName}</div>
           )}
           <div className="flex flex-row items-center py-1">
             {status.isOnline ? (
               <div className="flex items-center">
                 <span className="h-3 w-3 rounded-full bg-green-500 mr-2"></span>
-                <span className="text-green-600 font-medium">Online</span>
+                <span className="text-green-600 font-medium"
+                style={{color: theme === "dark" ? "#ffffff" : "black"}}>Online</span>
               </div>
             ) : (
               <span className="h-3 w-3 rounded-full bg-yellow-400"></span>
             )}
             {status.lastSeen && !status.isOnline && (
-              <div className="mx-2" style={{ fontSize: 12 }}>
+              <div className="mx-2" style={{ fontSize: 12 , color: theme === "dark" ? "#ffffff" : "black",}}>
                 {getLastSeenText(status.lastSeen)}
               </div>
             )}
@@ -236,7 +237,8 @@ const Chat = ({ onSend }) => {
           return (
             <div key={index}>
               {showDate && (
-                <div className="text-center text-xs text-gray-500 my-2">
+                <div className="text-center text-xs text-gray-500 my-2"
+                style={{ color: theme === "dark" ? "#ffffff" : "black"}}>
                   {currentDate}
                 </div>
               )}
@@ -282,6 +284,7 @@ const Chat = ({ onSend }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"
+                    style={{ color: theme === "dark" ? "#ffffff" : "black",}}
                   >
                     View Document
                   </a>
@@ -293,6 +296,7 @@ const Chat = ({ onSend }) => {
                       fontSize: 10,
                       justifyContent: "center",
                       display: "flex",
+                       color: theme === "dark" ? "#ffffff" : "black",
                     }}
                   >
                     {getTime(msg.createdAt)}

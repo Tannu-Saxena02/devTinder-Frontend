@@ -11,6 +11,7 @@ import LandingPage from "./LandingPage";
 const Body = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const theme = useSelector((state) => state.theme);
   const userData = useSelector((store) => store.user);
   useEffect(() => {
     console.log("userdata");
@@ -33,7 +34,9 @@ const Body = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto"
+      style={{backgroundColor:theme === "dark"? "#1D232A":"#F4F5F7"}}
+      >
         <Outlet />
       </div>
     </div>

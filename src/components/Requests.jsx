@@ -6,6 +6,7 @@ import { addRequests,removeRequests } from "../utils/requestSlice";
 
 const Requests = () => {
   const requests = useSelector((store) => store.requests);
+  const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const fetchRequests = async () => {
     try {
@@ -35,11 +36,13 @@ const Requests = () => {
   };
   if (!requests) return;
 
-  if (requests.length === 0) return <h1 className="flex justify-center my-10"> No Requests Found</h1>;
+  if (requests.length === 0) return <h1 className="flex justify-center my-10"
+   style={{color: theme === "dark" ? "#ffffff" : "black",fontWeight:"500"}}> No Requests Found</h1>;
 
   return (
     <div className="text-center my-10">
-      <h1 className="text-bold text-white text-3xl flex justify-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]">
+      <h1 className="text-bold text-white text-3xl flex justify-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]"
+       style={{color: theme === "dark" ? "#ffffff" : "black",fontWeight:"bold"}}>
         Connection Requests
       </h1>
 
@@ -51,6 +54,7 @@ const Requests = () => {
           <div
             key={_id}
             className="flex  items-center m-4 p-4 rounded-lg bg-base-300 w-[80%] sm:w-[65%] md:w-[75%] lg:w-[65%] mx-auto"
+             style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
           >
             <div>
               <img
@@ -60,11 +64,14 @@ const Requests = () => {
               />
             </div>
             <div className="text-left mx-6">
-              <div className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]">
+              <div className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]"
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}
+              >
                 {firstName + " " + lastName}
               </div>
-              {age && gender && <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]">{age + ", " + gender}</div>}
-              <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]">{about}</div>
+              {age && gender && <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]" style={{color: theme === "dark" ? "#ffffff" : "black"}}>{age + ", " + gender}</div>}
+              <div className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]"
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}>{about}</div>
             </div>
             <div className="flex ml-auto">
               <button className="btn btn-primary mx-1 px-2 py-1 text-xs sm:px-2 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base"  onClick={() => reviewRequest("rejected", requests._id)}>Reject</button>

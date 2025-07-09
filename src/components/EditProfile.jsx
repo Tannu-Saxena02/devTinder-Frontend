@@ -4,6 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { useSelector } from "react-redux";
 
 const EditProfile = ({ user }) => {
   const [firstName, setFirstName] = useState(user.firstName);
@@ -19,6 +20,7 @@ const EditProfile = ({ user }) => {
   const [ageError, setAgeError] = useState("");
   const [photoError, setPhotoError] = useState("");
   const [genderError, setGenderError] = useState("");
+  const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const [showToast, setShowToast] = useState(false);
 
@@ -126,16 +128,20 @@ const EditProfile = ({ user }) => {
     //  w-[96%] sm:w-[90%] md:w-[90%] lg:w-[80%]
     <div className="flex justify-center my-10">
       <div className="flex justify-center flex-col sm:flex-col md:flex-col lg:flex-row">
-        <div className="h-130 sm:h-[60] md:h-[60] lg:h-[150] card bg-base-300 w-96 shadow-xl mx-10">
+        <div className="h-130 sm:h-[60] md:h-[60] lg:h-[150] card bg-base-300 w-96 shadow-xl mx-10"
+          style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}>
           <div className="card-body">
-            <h2 className="card-title justify-center">Edit Profile</h2>
+            <h2 className="card-title justify-center"
+            style={{color: theme === "dark" ? "#ffffff" : "black",fontWeight:"bold"}}>Edit Profile</h2>
             <div>
-              <div className="label-text">First Name:</div>
+              <div className="label-text"
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}>First Name:</div>
               <div>
                 <input
                   type="text"
                   value={firstName}
                   className="input input-bordered w-full max-w-xs"
+                  style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
                   onChange={(e) => {
                     let val = e.target.value;
                     setFirstName(val);
@@ -150,11 +156,13 @@ const EditProfile = ({ user }) => {
                   </p>
                 )}
               </div>
-              <div className="label-text">Last Name:</div>
+              <div className="label-text"
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}>Last Name:</div>
               <div>
                 <input
                   type="text"
                   value={lastName}
+                  style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
                   className="input input-bordered w-full max-w-xs"
                   onChange={(e) => {
                     setLastName(e.target.value);
@@ -170,11 +178,13 @@ const EditProfile = ({ user }) => {
                   </p>
                 )}
               </div>
-              <div className="label-text">Photo URL :</div>
+              <div className="label-text"
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}>Photo URL :</div>
               <div>
                 <input
                   type="text"
                   value={photoUrl}
+                  style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
                   className="input input-bordered w-full max-w-xs"
                   onChange={(e) => {
                     setPhotoUrl(e.target.value);
@@ -190,11 +200,13 @@ const EditProfile = ({ user }) => {
                   </p>
                 )}
               </div>
-              <div className="label-text">Age:</div>
+              <div className="label-text"
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}>Age:</div>
               <div>
                 <input
                   type="text"
                   value={age}
+                  style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
                   className="input input-bordered w-full max-w-xs"
                   onChange={(e) => {
                     setAge(e.target.value);
@@ -210,11 +222,13 @@ const EditProfile = ({ user }) => {
                   </p>
                 )}
               </div>
-              <div className="label-text">Gender:</div>
+              <div className="label-text"
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}>Gender:</div>
 
               <select
                 className="select select-bordered w-full max-w-xs"
                 value={gender}
+                  style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
                 onChange={(e) => {
                   setGender(e.target.value);
                   let val = e.target.value;
@@ -231,12 +245,13 @@ const EditProfile = ({ user }) => {
                 <option value="other">Other</option>
               </select>
 
-              <span className="label-text">About:</span>
+              <span className="label-text"  style={{color: theme === "dark" ? "#ffffff" : "black"}}>About:</span>
               <div>
                 <input
                   type="text"
                   value={about}
                   className="input input-bordered w-full max-w-xs"
+                  style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
                   onChange={handleChange}
                 />
                 {aboutError && (

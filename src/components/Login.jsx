@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
@@ -13,7 +13,7 @@ const Login = () => {
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [loginStatus, setLoginStatus] = useState(""); // "success", "error"
-
+  const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -62,17 +62,20 @@ const Login = () => {
   return (
     <div className="flex justify-center my-10">
       <div
-        className="card bg-base-300  shadow-sm w-76 sm:w-85 md:w-90 lg:w-96 xl:w-[380px]
-"
+        className="card bg-base-300  shadow-sm w-76 sm:w-85 md:w-90 lg:w-96 xl:w-[380px]"
+         style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
       >
         <div className="card-body">
-          <h2 className="card-title justify-center">Login</h2>
+          <h2 className="card-title justify-center"
+          style={{ color: theme === "dark" ? "#ffffff" : "black"}}
+          >Login</h2>
 
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Email ID</legend>
+            <legend className="fieldset-legend"  style={{ color: theme === "dark" ? "#ffffff" : "black"}}>Email ID</legend>
             <input
               type="text"
               value={emailId}
+              style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
               onChange={(e) => {
                 const val = e.target.value;
                 setEmailId(val);
@@ -89,11 +92,13 @@ const Login = () => {
             )}
           </fieldset>
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Password</legend>
+            <legend className="fieldset-legend"
+             style={{ color: theme === "dark" ? "#ffffff" : "black"}}>Password</legend>
             <input
               type="text"
               className="input"
               value={password}
+              style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
               onChange={(e) => {
                 const val = e.target.value;
                 setPassword(val);
@@ -111,6 +116,7 @@ const Login = () => {
             <div
               className="btn btn-primary w-63 sm:w-68 md:w-75 lg:w-80"
               onClick={handleLogin}
+              style={{color: theme === "dark" ? "#ffffff" : "black"}}
             >
               Sign In
             </div>
@@ -121,6 +127,7 @@ const Login = () => {
             actions
             className="m-auto cursor-pointer py-2"
             onClick={() => navigate("/signup")}
+             style={{ color: theme === "dark" ? "#ffffff" : "black"}}
           >
             New User? Signup Here
           </p>
