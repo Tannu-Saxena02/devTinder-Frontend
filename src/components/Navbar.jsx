@@ -14,6 +14,7 @@ import { FaUsers } from "react-icons/fa";
 import { TbUsersPlus } from "react-icons/tb";
 import { VscFeedback } from "react-icons/vsc";
 import { IoHome } from "react-icons/io5";
+import { MdLockReset } from "react-icons/md";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
@@ -196,6 +197,25 @@ const Navbar = () => {
                       }}
                     >
                       Requests
+                    </div>
+                  </Link>
+                </li>
+                 <li>
+                  <Link to="/resetpassword"
+                  onClick={()=>{
+                      dispatch(addForgot(false));
+                  }}>
+                    <MdLockReset
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      Reset Password
                     </div>
                   </Link>
                 </li>

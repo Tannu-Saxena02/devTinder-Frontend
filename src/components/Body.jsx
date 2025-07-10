@@ -40,7 +40,7 @@ const Body = () => {
           status: false,
           isOpen: true,
           title: "Error",
-          message: res?.data?.message,
+          message: err?.data?.message,
           onClose: closeDialog,
         });
     }

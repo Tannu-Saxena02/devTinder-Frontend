@@ -18,6 +18,8 @@ import Privacy from "./components/Privacy";
 import LandingPage from "./components/LandingPage";
 import Signup from "./components/Signup";
 import Requests from "./components/requests";
+import ForgotPassword from "./components/forgotPassword";
+
 
 function App() {
   const [count, setCount] = useState(0);
@@ -38,6 +40,8 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/chat/:targetUserId" element={<Chat />} />
               <Route path="/otpverification" element={<OtpVerification />} />
+              <Route path="/forgotpassword" element={<ForgotPassword/>} />
+              <Route path="/resetpassword" element={<ForgotPassword/>} />
             </Route>
           </Routes>
         </BrowserRouter>
