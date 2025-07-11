@@ -6,7 +6,7 @@ import encrpt from "../assets/networks.webp";
 import mode from "../assets/mode.png";
 import system from "../assets/system.png";
 
-import OnetoOne from "../assets/OnetoOne.webp";
+import OnetoOne from "../assets/onetoones.png";
 import photo from "../assets/photo.jpg";
 import premium from "../assets/premium.png";
 import sticker from "../assets/sticker.jpg";
