@@ -141,6 +141,7 @@ const Footer = () => {
             cursor: "pointer",
           }}
           onClick={() => {
+            closeDialog();
             navigate("/login");
           }}
         >

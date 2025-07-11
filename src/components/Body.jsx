@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
@@ -14,45 +14,82 @@ const Body = () => {
   const navigate = useNavigate();
   const theme = useSelector((state) => state.theme);
   const userData = useSelector((store) => store.user);
-   const [dialog, setDialog] = useState({
-      status: false,
-      isOpen: false,
-      title: "",
-      message: "",
-      onClose: null,
-    });
-  useEffect(() => {
-    console.log("userdata");
-    fetchUser();
-  }, []);
+  const [dialog, setDialog] = useState({
+    status: false,
+    isOpen: false,
+    title: "",
+    message: "",
+    onClose: null,
+  });
   const fetchUser = async () => {
-    if (userData) return;
+        if (userData) return;
     try {
       const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
       });
       console.log("responser" + res);
 
-      dispatch(addUser(res.data));
-    } catch (err) {
-      if (err.status == 401) navigate("/login");
-      setDialog({
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          dispatch(addUser(res.data?.data));
+        }
+      } else {
+        setDialog({
           status: false,
           isOpen: true,
           title: "Error",
-          message: err?.data?.message,
+          message: res?.data,
           onClose: closeDialog,
         });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
     }
   };
-   const closeDialog = () => {
+  useEffect(() => {    
+    fetchUser();
+  }, []);
+
+  const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-grow overflow-auto"
-      style={{backgroundColor:theme === "dark"? "#1D232A":"#F4F5F7"}}
+      <div
+        className="flex-grow overflow-auto"
+        style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#F4F5F7" }}
       >
         <Outlet />
       </div>

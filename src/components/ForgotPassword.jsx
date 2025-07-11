@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Dialog from "../utils/Dialog";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [password, setPassword] = useState("");
@@ -19,51 +22,185 @@ const ForgotPassword = () => {
     message: "",
     onClose: null,
   });
+  const navigate = useNavigate();
   const theme = useSelector((state) => state.theme);
   const isForgot = useSelector((state) => state.forgot);
   function validationFields() {
     let isValid = true;
+
+    // Reset previous errors
+    setPasswordError("");
+    setConfirmPasswordError("");
 
     if (!password) {
       setPasswordError(
         isForgot ? "Password is required" : "Old Password is required"
       );
       isValid = false;
-    } else setPasswordError("");
+    }
+
     if (!confirmPassword) {
       setConfirmPasswordError(
         isForgot ? "Confirm Password is required" : "New Password is required"
       );
       isValid = false;
-    } else setConfirmPasswordError("");
+    }
+    if (password && confirmPassword) {
+      if (isForgot && password !== confirmPassword) {
+        setPasswordError("Passwords must match");
+        setConfirmPasswordError("Passwords must match");
+        isValid = false;
+      }
+
+      if (!isForgot && password === confirmPassword) {
+        setPasswordError("Old and new passwords must be different");
+        setConfirmPasswordError("Old and new passwords must be different");
+        isValid = false;
+      }
+    }
+
     return isValid;
   }
-  function handleForgot() {
+
+  async function handleForgot() {
     try {
       if (validationFields()) {
+        const storedEmail = localStorage.getItem("emailId");
+        console.log(storedEmail + " " + confirmPassword);
+
+        const res = await axios.post(
+          BASE_URL + "/forgot-password",
+          {
+            email: storedEmail,
+            newpassword: confirmPassword,
+          },
+          { withCredentials: true }
+        );
+        if (res.data.success) {
+          if (res.data?.message.length >= 0) {
+            setDialog({
+              status: true,
+              isOpen: true,
+              title: "Success",
+              message: res?.data?.message,
+              onClose: () => {
+                closeDialog();
+                navigate("/login");
+              },
+            });
+          }
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: res?.data,
+            onClose: closeDialog,
+          });
+        }
       }
-    } catch (error) {
-      setDialog({
-        status: false,
-        isOpen: true,
-        title: "Error",
-        message: err?.data?.message,
-        onClose: closeDialog,
-      });
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
     }
   }
-  function handleReset() {
+  async function handleReset() {
     try {
       if (validationFields()) {
+        const res = await axios.post(
+          BASE_URL + "/resetpassword",
+          {
+            password: password,
+            newPassword: confirmPassword,
+          },
+          { withCredentials: true }
+        );
+        if (res.data.success) {
+          if (res.data?.message.length >= 0) {
+            setDialog({
+              status: true,
+              isOpen: true,
+              title: "Success",
+              message: res?.data?.message,
+              onClose: () => {
+                closeDialog();
+                navigate("/login");
+              },
+            });
+          }
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: res?.data,
+            onClose: closeDialog,
+          });
+        }
       }
-    } catch (error) {
-      setDialog({
-        status: false,
-        isOpen: true,
-        title: "Error",
-        message: err?.data?.message,
-        onClose: closeDialog,
-      });
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error,
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message,
+          onClose: closeDialog,
+        });
+      }
     }
   }
   const closeDialog = () => {

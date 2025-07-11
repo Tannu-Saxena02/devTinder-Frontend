@@ -8,6 +8,7 @@ import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 import EmojiPicker from "emoji-picker-react";
 import Dialog from "../utils/Dialog";
+import { useNavigate } from "react-router-dom";
 
 const Chat = ({ onSend }) => {
   const { targetUserId } = useParams();
@@ -23,13 +24,14 @@ const Chat = ({ onSend }) => {
   const userId = user?._id;
   const messagesEndRef = useRef(null);
   const theme = useSelector((state) => state.theme);
-   const [dialog, setDialog] = useState({
-      status: false,
-      isOpen: false,
-      title: "",
-      message: "",
-      onClose: null,
-    });
+  const navigate = useNavigate();
+  const [dialog, setDialog] = useState({
+    status: false,
+    isOpen: false,
+    title: "",
+    message: "",
+    onClose: null,
+  });
   useEffect(() => {
     if (!userId) return;
     const socket = createSocketConnection();
@@ -75,47 +77,119 @@ const Chat = ({ onSend }) => {
       });
       console.log("targetUserId: " + targetUserId);
 
-      const chatMessages = chat?.data?.messages.map((msg) => {
-        const { senderId, text, file, createdAt } = msg;
-        return {
-          firstName: senderId?.firstName,
-          lastName: senderId?.lastName,
-          text,
-          file,
-          createdAt,
-        };
-      });
-      setMessages(chatMessages);
-    } catch (error) {
-       setDialog({
+      if (chat.data.success) {
+        if (chat.data?.message.length >= 0) {
+          const chatMessages = chat?.data?.data.messages.map((msg) => {
+            const { senderId, text, file, createdAt } = msg;
+            return {
+              firstName: senderId?.firstName,
+              lastName: senderId?.lastName,
+              text,
+              file,
+              createdAt,
+            };
+          });
+          setMessages(chatMessages);
+        }
+      } else {
+        setDialog({
           status: false,
           isOpen: true,
           title: "Error",
-          message: err?.data?.message,
+          message: chat?.data,
           onClose: closeDialog,
         });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
     }
   };
-    const closeDialog = () => {
+  const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   const getStatus = async () => {
     try {
-      const statusResponse = await axios.get(
-        BASE_URL + "/status/" + targetUserId,
-        {
-          withCredentials: true,
+      const res = await axios.get(BASE_URL + "/status/" + targetUserId, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          setStatus(res.data?.data);
         }
-      );
-      setStatus(statusResponse.data);
-    } catch (error) {
-      setDialog({
+      } else {
+        setDialog({
           status: false,
           isOpen: true,
           title: "Error",
-          message: err?.data?.message,
+          message: res?.data,
           onClose: closeDialog,
         });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
     }
   };
 
@@ -185,13 +259,13 @@ const Chat = ({ onSend }) => {
         currentTime: new Date(),
       });
     } catch (error) {
-       setDialog({
-          status: false,
-          isOpen: true,
-          title: "Error",
-          message: "File upload failed",
-          onClose: closeDialog,
-        });
+      setDialog({
+        status: false,
+        isOpen: true,
+        title: "Error",
+        message: "File upload failed",
+        onClose: closeDialog,
+      });
     }
   };
   const sendMessage = () => {
@@ -227,20 +301,37 @@ const Chat = ({ onSend }) => {
         </div>
         <div className="flex flex-col">
           {status.firstName && status.lastName && (
-            <div style={{ color: theme === "dark" ? "#ffffff" : "black",fontWeight:"500"}}>{status.firstName + " " + status.lastName}</div>
+            <div
+              style={{
+                color: theme === "dark" ? "#ffffff" : "black",
+                fontWeight: "500",
+              }}
+            >
+              {status.firstName + " " + status.lastName}
+            </div>
           )}
           <div className="flex flex-row items-center py-1">
             {status.isOnline ? (
               <div className="flex items-center">
                 <span className="h-3 w-3 rounded-full bg-green-500 mr-2"></span>
-                <span className="text-green-600 font-medium"
-                style={{color: theme === "dark" ? "#ffffff" : "black"}}>Online</span>
+                <span
+                  className="text-green-600 font-medium"
+                  style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                >
+                  Online
+                </span>
               </div>
             ) : (
               <span className="h-3 w-3 rounded-full bg-yellow-400"></span>
             )}
             {status.lastSeen && !status.isOnline && (
-              <div className="mx-2" style={{ fontSize: 12 , color: theme === "dark" ? "#ffffff" : "black",}}>
+              <div
+                className="mx-2"
+                style={{
+                  fontSize: 12,
+                  color: theme === "dark" ? "#ffffff" : "black",
+                }}
+              >
                 {getLastSeenText(status.lastSeen)}
               </div>
             )}
@@ -266,8 +357,10 @@ const Chat = ({ onSend }) => {
           return (
             <div key={index}>
               {showDate && (
-                <div className="text-center text-xs text-gray-500 my-2"
-                style={{ color: theme === "dark" ? "#ffffff" : "black"}}>
+                <div
+                  className="text-center text-xs text-gray-500 my-2"
+                  style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                >
                   {currentDate}
                 </div>
               )}
@@ -313,7 +406,7 @@ const Chat = ({ onSend }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"
-                    style={{ color: theme === "dark" ? "#ffffff" : "black",}}
+                    style={{ color: theme === "dark" ? "#ffffff" : "black" }}
                   >
                     View Document
                   </a>
@@ -325,7 +418,7 @@ const Chat = ({ onSend }) => {
                       fontSize: 10,
                       justifyContent: "center",
                       display: "flex",
-                       color: theme === "dark" ? "#ffffff" : "black",
+                      color: theme === "dark" ? "#ffffff" : "black",
                     }}
                   >
                     {getTime(msg.createdAt)}

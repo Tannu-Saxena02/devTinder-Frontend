@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
 import { Link } from "react-router-dom";
@@ -11,12 +11,12 @@ const Connections = () => {
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const [dialog, setDialog] = useState({
-        status: false,
-        isOpen: false,
-        title: "",
-        message: "",
-        onClose: null,
-      });
+    status: false,
+    isOpen: false,
+    title: "",
+    message: "",
+    onClose: null,
+  });
   const fetchConnections = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/connections", {
@@ -24,19 +24,55 @@ const Connections = () => {
       });
       console.log("connection " + JSON.stringify(res?.data?.data));
 
-      dispatch(addConnections(res?.data?.data));
-    } catch (err) {
-      console.log("ERROR " + err.data);
-       setDialog({
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          dispatch(addConnections(res?.data?.data));
+        }
+      } else {
+        setDialog({
           status: false,
           isOpen: true,
           title: "Error",
-          message: err?.data?.message,
+          message: res?.data,
           onClose: closeDialog,
         });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
     }
   };
-   const closeDialog = () => {
+  const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   useEffect(() => {
@@ -121,7 +157,7 @@ const Connections = () => {
           </div>
         );
       })}
-       {dialog.isOpen && (
+      {dialog.isOpen && (
         <Dialog
           status={dialog.status}
           isOpen={dialog.isOpen}

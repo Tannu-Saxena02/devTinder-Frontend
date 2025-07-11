@@ -48,13 +48,15 @@ api validation api will hit only success validation(done)
 front page for UI  (almost)
 APP ICON and NAME (done)
 
-Terms and condition -black page issue
-Privacy policy page -black page issue
-OTP screen and verify otp screen -timer 30sec & resend-30sec -black page issue
-sendotp & verify & google api implementation 
-success & error dialog show on otp send & on api error
-Goggle auth Implementation
-change and forgot password api & UI
+Terms and condition -black page issue (done)
+Privacy policy page -black page issue (done)
+
+OTP screen and verify otp screen -timer 30sec & resend-30sec -black page issue (done)
+sendotp & verify & google api implementation  (done)
+Goggle auth Implementation(done)
+change and forgot password api & UI (done)
+
+success & error dialog show on otp send & on api error (api handling backend & frontend)
 Light & dark mode(remaining for some screens)
 
 beautify Ui and responsiveness

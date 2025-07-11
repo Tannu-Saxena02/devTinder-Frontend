@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useSelector } from "react-redux";
 import Dialog from "../utils/Dialog";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = ({ user }) => {
   const [firstName, setFirstName] = useState(user.firstName);
@@ -24,6 +25,7 @@ const EditProfile = ({ user }) => {
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const [showToast, setShowToast] = useState(false);
+  const navigate = useNavigate();
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -47,23 +49,62 @@ const EditProfile = ({ user }) => {
           },
           { withCredentials: true }
         );
-        dispatch(addUser(res?.data?.data));
+        if (res.data.success) {
+          if (res.data?.message.length >= 0) {
+            dispatch(addUser(res?.data?.data));
+            setDialog({
+              status: true,
+              isOpen: true,
+              title: "Success",
+              message: res?.data?.message,
+              onClose: () => {
+                navigate("/feed");
+              },
+            });
+          }
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: res?.data,
+            onClose: closeDialog,
+          });
+        }
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
         setDialog({
-          status: true,
+          status: false,
           isOpen: true,
-          title: "Success",
-          message: res?.data?.message,
+          title: "Error",
+          message: err?.message || "Unexpected error",
           onClose: closeDialog,
         });
       }
-    } catch (err) {
-      setDialog({
-        status: false,
-        isOpen: true,
-        title: "Error",
-        message: err.response.data,
-        onClose: closeDialog,
-      });
     }
   };
   const closeDialog = () => {

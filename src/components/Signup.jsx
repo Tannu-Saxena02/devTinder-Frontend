@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
@@ -19,11 +19,11 @@ const Signup = () => {
   const [errorPassword, setErrorPassword] = useState("");
   const theme = useSelector((state) => state.theme);
   const [dialog, setDialog] = useState({
-        status: false,
-        isOpen: false,
-        title: "",
-        message: "",
-        onClose: null,
+    status: false,
+    isOpen: false,
+    title: "",
+    message: "",
+    onClose: null,
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -64,20 +64,59 @@ const Signup = () => {
           { firstName, lastName, emailId, password },
           { withCredentials: true }
         );
-        dispatch(addTerms("true"));
-        dispatch(addUser(res.data.data));
-        return navigate("/terms");
+        console.log("response"+res);
+        
+        if (res.data.success) {
+          if (res.data?.message.length >= 0) {
+            dispatch(addTerms("true"));
+            dispatch(addUser(res.data.data));
+            navigate("/terms");
+          }
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: res?.data?.error,
+            onClose: closeDialog,
+          });
+        }
       }
     } catch (err) {
-       setDialog({
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          console.log(JSON.stringify(err?.response) + " "+JSON.stringify(err));
+          
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
           status: false,
           isOpen: true,
           title: "Error",
-          message: err?.data?.message,
-          onClose: closeDialog
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
         });
-      // alert(err?.response?.data || "Something went wrong");
-    
+      }
     }
   };
   const closeDialog = () => {
@@ -85,21 +124,32 @@ const Signup = () => {
   };
   return (
     <div className="flex justify-center my-10">
-      <div className="card bg-base-300 shadow-sm w-76 sm:w-85 md:w-90 lg:w-96 xl:w-[380px]"
-       style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}>
+      <div
+        className="card bg-base-300 shadow-sm w-76 sm:w-85 md:w-90 lg:w-96 xl:w-[380px]"
+        style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
+      >
         <div className="card-body">
-          <h2 className="card-title justify-center"
-           style={{ color: theme === "dark" ? "#ffffff" : "black"}}
-          >Sign Up</h2>
+          <h2
+            className="card-title justify-center"
+            style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+          >
+            Sign Up
+          </h2>
 
           <div>
-            <div className=""  style={{ color: theme === "dark" ? "#ffffff" : "black"}}>
+            <div
+              className=""
+              style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+            >
               First Name
             </div>
             <input
               type="text"
               value={firstName}
-              style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
+              style={{
+                backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
+                color: theme === "dark" ? "#ffffff" : "black",
+              }}
               className={`input input-bordered w-full max-w-xs `}
               onChange={(e) => {
                 const val = e.target.value;
@@ -117,13 +167,20 @@ const Signup = () => {
           </div>
 
           <fieldset className="fieldset">
-            <legend className="fieldset-legend"
-            style={{ color: theme === "dark" ? "#ffffff" : "black"}}>Last Name</legend>
+            <legend
+              className="fieldset-legend"
+              style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+            >
+              Last Name
+            </legend>
 
             <input
               type="text"
               value={lastName}
-              style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
+              style={{
+                backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
+                color: theme === "dark" ? "#ffffff" : "black",
+              }}
               className="input input-bordered w-full max-w-xs"
               onChange={(e) => {
                 const val = e.target.value;
@@ -139,12 +196,19 @@ const Signup = () => {
           </fieldset>
 
           <fieldset className="fieldset">
-            <legend className="fieldset-legend"
-            style={{ color: theme === "dark" ? "#ffffff" : "black"}}>Email ID</legend>
+            <legend
+              className="fieldset-legend"
+              style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+            >
+              Email ID
+            </legend>
             <input
               type="text"
               value={emailId}
-              style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
+              style={{
+                backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
+                color: theme === "dark" ? "#ffffff" : "black",
+              }}
               onChange={(e) => {
                 const val = e.target.value;
                 setEmailId(val);
@@ -152,9 +216,7 @@ const Signup = () => {
                   setErrorEmail("Email Id is required");
                 } else if (!/\S+@\S+\.\S+/.test(val)) {
                   setErrorEmail("Email Id format is invalid");
-                }
-                else
-                 setErrorEmail("")
+                } else setErrorEmail("");
               }}
               className="input"
             />
@@ -164,13 +226,20 @@ const Signup = () => {
           </fieldset>
 
           <fieldset className="fieldset">
-            <legend className="fieldset-legend"
-            style={{ color: theme === "dark" ? "#ffffff" : "black"}}>Password</legend>
+            <legend
+              className="fieldset-legend"
+              style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+            >
+              Password
+            </legend>
             <input
               type="text"
               className="input"
               value={password}
-              style={{ backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",color: theme === "dark" ? "#ffffff" : "black"}}
+              style={{
+                backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
+                color: theme === "dark" ? "#ffffff" : "black",
+              }}
               onChange={(e) => {
                 const val = e.target.value;
                 setPassword(val);
@@ -188,7 +257,7 @@ const Signup = () => {
             <div
               className="btn btn-primary w-63 sm:w-68 md:w-75 lg:w-80"
               onClick={handleSignUp}
-              style={{ color: theme === "dark" ? "#ffffff" : "black"}}
+              style={{ color: theme === "dark" ? "#ffffff" : "black" }}
             >
               Sign Up
             </div>
@@ -196,13 +265,16 @@ const Signup = () => {
           <p
             className="m-auto cursor-pointer py-2"
             onClick={() => navigate("/login")}
-            style={{ color: theme === "dark" ? "#ffffff" : "black",fontWeight:"500"}}
+            style={{
+              color: theme === "dark" ? "#ffffff" : "black",
+              fontWeight: "500",
+            }}
           >
             Existing User? Login Here
           </p>
         </div>
       </div>
-       {dialog.isOpen && (
+      {dialog.isOpen && (
         <Dialog
           status={dialog.status}
           isOpen={dialog.isOpen}

@@ -7,7 +7,8 @@ import { BASE_URL } from "../utils/constants";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import Dialog from "../utils/Dialog";
 import { addForgot } from "../utils/forgotSlice";
-
+const Web_ClientId =
+  "627812142753-bde51a0nu2cop3ji87n7qrd3tqlkok9j.apps.googleusercontent.com";
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
@@ -59,21 +60,121 @@ const Login = () => {
           },
           { withCredentials: true }
         );
-        dispatch(addUser(res.data));
-        setLoginStatus("success");
-        return navigate("/feed");
+        if (res.data.success) {
+          if (res.data?.message.length >= 0) {
+            dispatch(addUser(res.data?.data));
+            navigate("/feed");
+          }
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: res?.data,
+            onClose: closeDialog,
+          });
+        }
       }
     } catch (err) {
-      // setLoginStatus("error");
-      // setError("ERROR " + err?.response?.data || "Something went wrong");
-      //  console.log(err);
-      setDialog({
-        status: false,
-        isOpen: true,
-        title: "Error",
-        message: err?.data?.message,
-        onClose: closeDialog,
-      });
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    }
+  };
+  const handleGoogleLogin = async (token) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/google-auth",
+        {
+          credential: token?.credential,
+          client_id: token?.clientId,
+        },
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          dispatch(addUser(res?.data?.data));
+          setDialog({
+            status: true,
+            isOpen: true,
+            title: "Success",
+            message: res?.data?.message,
+            onClose: () => {
+              navigate("/profile");
+            },
+          });
+          console.log(res.data?.message);
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error,
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message,
+          onClose: closeDialog,
+        });
+      }
     }
   };
   const closeDialog = () => {
@@ -150,12 +251,19 @@ const Login = () => {
             )}
           </fieldset>
           <div className="card-actions justify-center my-2">
-            <div 
-            onClick={()=>{
-              dispatch(addForgot(true));
-              navigate("/otpverification")
-            }}
-            style={{ color: "blue", textDecoration: "underline",textAlign:"right", alignSelf: "flex-end", cursor:"pointer"}}>
+            <div
+              onClick={() => {
+                dispatch(addForgot(true));
+                navigate("/otpverification");
+              }}
+              style={{
+                color: "blue",
+                textDecoration: "underline",
+                textAlign: "right",
+                alignSelf: "flex-end",
+                cursor: "pointer",
+              }}
+            >
               Forgot Password
             </div>
             <div
@@ -183,6 +291,7 @@ const Login = () => {
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
+                handleGoogleLogin(credentialResponse);
               }}
               onError={() => {
                 console.log("Login Failed");

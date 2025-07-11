@@ -2,9 +2,10 @@ import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import Dialog from "../utils/Dialog";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
 
 const OtpVerification = () => {
-  const email = localStorage.getItem("userEmail") || "anjali@example.com";
   const [otp, setOtp] = useState(Array(6).fill(""));
   const theme = useSelector((state) => state.theme);
   const inputRefs = useRef([]);
@@ -76,29 +77,91 @@ const OtpVerification = () => {
 
     return isValid;
   }
-  function handleSendOtp() {
+  async function handleSendOtp() {
     try {
       if (validationFields()) {
-        SetIsOtp(true);
+        const res = await axios.post(
+          BASE_URL + "/sendOTP",
+          {
+            email: emailId,
+          },
+          { withCredentials: true }
+        );
+        localStorage.setItem("emailId", emailId);
+        if (res.data.success) {
+          if (res.data.message.length >= 0) SetIsOtp(true);
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: res?.data?.message,
+            onClose: closeDialog,
+          });
+        }
       }
     } catch (err) {
-      setDialog({
-        status: false,
-        isOpen: true,
-        title: "Error",
-        message: err?.data?.message,
-        onClose: closeDialog,
-      });
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
     }
   }
   const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const enteredOtp = otp.join("");
+    console.log(emailId + " " + otp + " " + enteredOtp);
     try {
       if (enteredOtp) {
-        navigate("/forgotpassword");
+        const res = await axios.post(
+          BASE_URL + "/verifyOTP",
+          {
+            email: emailId,
+            otp: enteredOtp,
+          },
+          { withCredentials: true }
+        );
+        if (res.data.success) {
+          if (res.data.message.length >= 0) navigate("/forgotpassword");
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: res?.data?.error,
+            onClose: closeDialog,
+          });
+        }
       } else {
         setDialog({
           status: false,
@@ -108,9 +171,40 @@ const OtpVerification = () => {
           onClose: closeDialog,
         });
       }
-    } catch (error) {}
-
-    // Add your API call or logic here
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    }
   };
 
   return (
@@ -136,7 +230,7 @@ const OtpVerification = () => {
             {isOtp
               ? "Enter the OTP we sent to"
               : "Enter the email for OTP Verification"}{" "}
-            {isOtp ? <span className="font-semibold">{email}</span> : null}
+            {isOtp ? <span className="font-semibold">{emailId}</span> : null}
           </p>
 
           <div className="flex justify-between gap-2 mb-6">

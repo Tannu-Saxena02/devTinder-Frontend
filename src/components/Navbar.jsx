@@ -1,5 +1,5 @@
 import axios from "axios";
-import React from "react";
+import React,{useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
@@ -15,26 +15,90 @@ import { TbUsersPlus } from "react-icons/tb";
 import { VscFeedback } from "react-icons/vsc";
 import { IoHome } from "react-icons/io5";
 import { MdLockReset } from "react-icons/md";
+import { addForgot } from "../utils/forgotSlice";
+import Dialog from "../utils/Dialog";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [dialog, setDialog] = useState({
+    status: false,
+    isOpen: false,
+    title: "",
+    message: "",
+    onClose: null,
+  });
   const handleLogout = async () => {
     try {
-      await axios.post(
+      const res=await axios.post(
         BASE_URL + "/logout",
         {},
         {
           withCredentials: true,
         }
       );
-      dispatch(removeUser());
-      return navigate("/login");
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          dispatch(removeUser());
+          setDialog({
+            status: true,
+            isOpen: true,
+            title: "Success",
+            message: res?.data?.message,
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data,
+          onClose: closeDialog,
+        });
+      }
     } catch (err) {
-      console.log(err);
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
     }
+  };
+    const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
@@ -129,7 +193,7 @@ const Navbar = () => {
                     <div
                       style={{
                         fontSize: 14,
-                        color:theme === "dark" ? "#ffffff" : "black"
+                        color: theme === "dark" ? "#ffffff" : "black",
                       }}
                     >
                       Home
@@ -200,11 +264,13 @@ const Navbar = () => {
                     </div>
                   </Link>
                 </li>
-                 <li>
-                  <Link to="/resetpassword"
-                  onClick={()=>{
+                <li>
+                  <Link
+                    to="/resetpassword"
+                    onClick={() => {
                       dispatch(addForgot(false));
-                  }}>
+                    }}
+                  >
                     <MdLockReset
                       size={20}
                       color={theme === "dark" ? "#ffffff" : "black"}
@@ -221,26 +287,24 @@ const Navbar = () => {
                 </li>
                 <li>
                   <div onClick={toggleTheme}>
-                    {theme === "dark" ?
-                    (
+                    {theme === "dark" ? (
                       <MdLightMode
                         size={20}
                         color={theme === "dark" ? "#ffffff" : "black"}
                       />
-                    ): (
+                    ) : (
                       <MdDarkMode
                         size={20}
                         color={theme === "dark" ? "#ffffff" : "black"}
                       />
-                    ) 
-                    }
+                    )}
                     <div
                       style={{
                         fontSize: 14,
                         color: theme === "dark" ? "#ffffff" : "black",
                       }}
                     >
-                      {theme === "dark" ? "Light Mode":"Dark Mode" }
+                      {theme === "dark" ? "Light Mode" : "Dark Mode"}
                     </div>
                   </div>
                 </li>
@@ -267,6 +331,15 @@ const Navbar = () => {
           </div>
         )}
       </div>
+      {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
     </div>
   );
 };
