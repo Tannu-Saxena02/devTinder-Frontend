@@ -17,7 +17,7 @@ import OtpVerification from "./components/OtpVerification";
 import Privacy from "./components/Privacy";
 import LandingPage from "./components/LandingPage";
 import Signup from "./components/Signup";
-import ForgotPassword from "./components/forgotPassword";
+import ForgotPassword from "./components/ForgotPassword";
 import Requests from "./components/Requests";
 
 
