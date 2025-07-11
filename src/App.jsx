@@ -17,8 +17,8 @@ import OtpVerification from "./components/OtpVerification";
 import Privacy from "./components/Privacy";
 import LandingPage from "./components/LandingPage";
 import Signup from "./components/Signup";
-import Requests from "./components/requests";
 import ForgotPassword from "./components/forgotPassword";
+import Requests from "./components/Requests";
 
 
 function App() {
