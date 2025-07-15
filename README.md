@@ -79,18 +79,20 @@ chat Feature. (done)
 - nginx,AWS,how we manually deploy our application
 # Deployment Steps :
 - Singup on AWS
-- Launch instance
+- Launch instance & download pem file
 - chmod 400 <secret>.pem
-- ssh -i
-- Install node version that currently in use
-- Git clone
+- ssh -i cmd
+- Install node version that currently in use ::
+   - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash 
+   - & exit then run, nvm install (current node version)
+- Git clone for frontend & backend project
 # Frontend
   - npm install -dependencies install
   - npm run build
-  - sudo apt update
-  - sudo apt install nginx
-  - sudo systemctl start nginx
-  - sudo systemctl enable nginx
+  - sudo apt update ->
+  - sudo apt install nginx ->
+  - sudo systemctl start nginx ->
+  - sudo systemctl enable nginx ->(only for first time deployment 4 steps)
   - copy code from dist(build files) to /var/www/html/
   -  sudo scp -r dist/* /var/www/html/
   - Enable port :80 of your instance
@@ -100,11 +102,17 @@ chat Feature. (done)
  - npm install pm2 -g
  - pm2 start npm --name "devTinder-backend" -- start
  - pm2 logs
- - pm2 list, pm2 flush <name>, pm2 stop <name>, pm2 delete<name>
- - config nginx - sudo nano /etc/nginx/sites-available/default
- - restart nginx - sudo systemctl restart nginx
+ - pm2 list, pm2 flush <name>, pm2 stop <name>, pm2 delete<name> or pm2 restart 0
+ - config nginx -> sudo nano /etc/nginx/sites-available/default (for config nginx that in # Nginx config)
+ - restart nginx -> sudo systemctl restart nginx
  - Modify the BASEURL in frontend project to "/api"
+ # for dotenv setup on server
+ - sudo nano .env & copy content of .env
+ - Press Ctrl + O → Enter (to save) &.  Press Ctrl + X (to exit)
+
+
 # Nginx config
+- nginx proxy pass /api to 3000 node app
  server_name 13.49.241.157;
    location /api/ {
         proxy_pass http://localhost:3000/;

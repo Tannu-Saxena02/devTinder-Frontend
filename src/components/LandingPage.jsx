@@ -4,7 +4,7 @@ import cloud from "../assets/cloud.webp";
 import network from "../assets/network.webp";
 import encrpt from "../assets/networks.webp";
 import mode from "../assets/mode.png";
-import system from "../assets/system.png";
+import system from "../assets/network.webp";
 
 import OnetoOne from "../assets/onetoones.png";
 import photo from "../assets/photo.jpg";
