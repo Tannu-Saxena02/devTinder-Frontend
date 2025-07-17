@@ -77,7 +77,7 @@ const UserCard = ({ user }) => {
   };
   return (
     <div
-      className="bg-base-300 w-90 sm:w-[60] md:w-[80] lg:w-[106] shadow-sm flex flex-col mx-auto rounded-md"
+      className="bg-base-300 w-96 sm:w-60 md:w-96 lg:w-[390px] shadow-sm flex flex-col mx-auto rounded-md my-4"
       style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
     >
       {/* <figure> */}

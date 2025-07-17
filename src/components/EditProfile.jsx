@@ -187,7 +187,7 @@ const EditProfile = ({ user }) => {
     <div className="flex justify-center my-10">
       <div className="flex justify-center flex-col sm:flex-col md:flex-col lg:flex-row">
         <div
-          className="h-130 sm:h-[60] md:h-[60] lg:h-[150] card bg-base-300 w-96 shadow-xl mx-10"
+          className="lg:h-[550px] card bg-base-300  w-96 shadow-xl mx-10 my-4"
           style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
         >
           <div className="card-body">

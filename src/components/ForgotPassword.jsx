@@ -211,7 +211,7 @@ const ForgotPassword = () => {
       <div className="flex justify-center my-10">
         <div className="flex justify-center flex-col sm:flex-col md:flex-col lg:flex-row">
           <div
-            className="w-95 sm:w-[60] md:w-[90] lg:w-[90] card bg-base-300   shadow-xl p-2"
+            className="w-80 sm:w-60 md:w-96 lg:w-96 card bg-base-300   shadow-xl p-2"
             style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
           >
             <div className="card-body">
