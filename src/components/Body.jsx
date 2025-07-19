@@ -73,13 +73,13 @@ const Body = () => {
           // });
         }
       } else {
-        setDialog({
-          status: false,
-          isOpen: true,
-          title: "Error",
-          message: err?.message || "Unexpected error",
-          onClose: closeDialog,
-        });
+        // setDialog({
+        //   status: false,
+        //   isOpen: true,
+        //   title: "Error",
+        //   message: err?.message || "Unexpected error",
+        //   onClose: closeDialog,
+        // });
       }
     } finally {
       setLoading(false);
