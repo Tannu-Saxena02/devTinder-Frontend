@@ -26,7 +26,7 @@ const Body = () => {
     const isLoggedIn = document.cookie.includes("token");
     console.log("view res"+userData+" "+isLoggedIn);
     
-    if (userData || !isLoggedIn) return;// on reload data will be lost
+    if (userData) return;// on reload data will be lost
     try {
       setLoading(true);
       const res = await axios.get(BASE_URL + "/profile/view", {
@@ -39,6 +39,7 @@ const Body = () => {
           dispatch(addUser(res.data?.data));
         }
       } else {
+        console.log(res?.data);
         setDialog({
           status: false,
           isOpen: true,
@@ -51,25 +52,25 @@ const Body = () => {
       console.log("ERROR" + err);
       if (err.response) {
         if (err.response.status === 401) {
-          setDialog({
-            status: false,
-            isOpen: true,
-            title: "Unauthorized",
-            message:
-              "Session expired or unauthorized access. Please login again.",
-            onClose: () => {
-              closeDialog();
-              navigate("/login");
-            },
-          });
+          // setDialog({
+          //   status: false,
+          //   isOpen: true,
+          //   title: "Unauthorized",
+          //   message:
+          //     "Session expired or unauthorized access. Please login again.",
+          //   onClose: () => {
+          //     closeDialog();
+          //     navigate("/login");
+          //   },
+          // });
         } else {
-          setDialog({
-            status: false,
-            isOpen: true,
-            title: "Error",
-            message: err?.response?.data?.error || "Something went wrong!",
-            onClose: closeDialog,
-          });
+          // setDialog({
+          //   status: false,
+          //   isOpen: true,
+          //   title: "Error",
+          //   message: err?.response?.data?.error || "Something went wrong!",
+          //   onClose: closeDialog,
+          // });
         }
       } else {
         setDialog({
