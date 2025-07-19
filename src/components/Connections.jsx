@@ -10,6 +10,7 @@ const Connections = () => {
   const connections = useSelector((store) => store.connections);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -19,6 +20,7 @@ const Connections = () => {
   });
   const fetchConnections = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
       });
@@ -70,6 +72,9 @@ const Connections = () => {
           onClose: closeDialog,
         });
       }
+    }
+    finally{
+      setLoading(false);
     }
   };
   const closeDialog = () => {
@@ -165,6 +170,11 @@ const Connections = () => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+       {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

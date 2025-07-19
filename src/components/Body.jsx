@@ -14,6 +14,7 @@ const Body = () => {
   const navigate = useNavigate();
   const theme = useSelector((state) => state.theme);
   const userData = useSelector((store) => store.user);
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -22,8 +23,10 @@ const Body = () => {
     onClose: null,
   });
   const fetchUser = async () => {
-        if (userData) return;
+    const isLoggedIn = document.cookie.includes("token");
+    if (userData || !isLoggedIn) return;// on reload data will be lost
     try {
+      setLoading(true);
       const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
       });
@@ -75,9 +78,11 @@ const Body = () => {
           onClose: closeDialog,
         });
       }
+    } finally {
+      setLoading(false);
     }
   };
-  useEffect(() => {    
+  useEffect(() => {
     fetchUser();
   }, []);
 
@@ -101,6 +106,11 @@ const Body = () => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+      {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

@@ -22,9 +22,11 @@ const EditProfile = ({ user }) => {
   const [ageError, setAgeError] = useState("");
   const [photoError, setPhotoError] = useState("");
   const [genderError, setGenderError] = useState("");
+  const [isShowButton, setIsShowButton] = useState(false);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [dialog, setDialog] = useState({
     status: false,
@@ -34,9 +36,80 @@ const EditProfile = ({ user }) => {
     onClose: null,
   });
 
+ 
+
+ function validateInput(val) {
+    // Validation
+     const values = (val === "" || val === undefined) ? user.about : val;
+     console.log(values+" >> "+val+">> "+user.about);
+     
+    const words = values.trim().split(/\s+/);
+    const charCount = values.length;
+
+    if (charCount > 250) {
+      setAboutError("Only 250 characters allowed.");
+      return false;
+    }
+
+    if (words.length > 40) {
+      setAboutError("Only 40 words allowed.");
+      return false;
+    }
+
+    const longWord = words.find((word) => word.length > 20);
+    if (longWord) {
+      setAboutError("Each word must be 20 characters or less.");
+      return false;
+    }
+    setAboutError("");
+    return true;
+  }
+
+  function validationFields() {
+    let isValid = true;
+
+    if (!firstName) {
+      setFirstNameError("First Name is required");
+      isValid = false;
+    } else {
+      setFirstNameError("");
+    }
+    if (!lastName) {
+      setLastNameError("Last Name is required");
+      isValid = false;
+    } else {
+      setLastNameError("");
+    }
+    if (!age) {
+      setAgeError("Age is required");
+      isValid = false;
+    } else {
+      setAgeError("");
+    }
+    if (!photoUrl) {
+      setPhotoError("Photo Url is required");
+      isValid = false;
+    } else {
+      setPhotoError("");
+    }
+    if (!about) {
+      setAboutError("about is required");
+      isValid = false;
+    } else {
+      setAboutError("");
+    }
+    if (!gender) {
+      setGenderError("Gender is required");
+      isValid = false;
+    } else {
+      setGenderError("");
+    }
+    return isValid;
+  }
   const saveProfile = async () => {
     try {
-      if (validationFields()) {
+      if (validationFields() && validateInput(about)) {
+        setLoading(true);
         const res = await axios.patch(
           BASE_URL + "/profile/edit",
           {
@@ -106,80 +179,20 @@ const EditProfile = ({ user }) => {
         });
       }
     }
+    finally{
+      setLoading(false)
+    }
   };
   const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
-  function validateInput(value) {
-    // Validation
-    const words = value.trim().split(/\s+/);
-    const charCount = value.length;
 
-    if (charCount > 250) {
-      setAboutError("Only 250 characters allowed.");
-      return;
-    }
-
-    if (words.length > 40) {
-      setAboutError("Only 40 words allowed.");
-      return;
-    }
-
-    const longWord = words.find((word) => word.length > 20);
-    if (longWord) {
-      setAboutError("Each word must be 20 characters or less.");
-      return;
-    }
-    setAboutError("");
-  }
-  function validationFields() {
-    let isValid = true;
-
-    if (!firstName) {
-      setFirstNameError("First Name is required");
-      isValid = false;
-    } else {
-      setFirstNameError("");
-    }
-    if (!lastName) {
-      setLastNameError("Last Name is required");
-      isValid = false;
-    } else {
-      setLastNameError("");
-    }
-    if (!age) {
-      setAgeError("Age is required");
-      isValid = false;
-    } else {
-      setAgeError("");
-    }
-    if (!photoUrl) {
-      setPhotoError("Photo Url is required");
-      isValid = false;
-    } else {
-      setPhotoError("");
-    }
-    if (!about) {
-      setAboutError("about is required");
-      isValid = false;
-    } else {
-      setAboutError("");
-    }
-    if (!gender) {
-      setGenderError("Gender is required");
-      isValid = false;
-    } else {
-      setGenderError("");
-    }
-    return isValid;
-  }
-  const handleChange = (e) => {
-    const value = e.target.value;
+  const handleChange = (value) => {
     setAbout(value);
     validateInput(value);
-    if (e.trim() !== "") {
-      setAboutError("");
-    }
+    // if (value.trim() !== "") {
+    //   setAboutError("");
+    // }
   };
 
   return (
@@ -362,7 +375,7 @@ const EditProfile = ({ user }) => {
                     backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
                     color: theme === "dark" ? "#ffffff" : "black",
                   }}
-                  onChange={handleChange}
+                onChange={(e) => handleChange(e.target.value)}
                 />
                 {aboutError && (
                   <p style={{ color: "red", fontSize: 13, marginTop: "1%" }}>
@@ -379,7 +392,7 @@ const EditProfile = ({ user }) => {
           </div>
         </div>
         <UserCard
-          user={{ firstName, lastName, photoUrl, age, gender, about }}
+          user={{ firstName, lastName, photoUrl, age, gender, about,isShowButton}}
         />
       </div>
       {showToast && (
@@ -397,6 +410,11 @@ const EditProfile = ({ user }) => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+       {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

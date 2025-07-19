@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { BASE_URL } from "../utils/constants";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import Dialog from "../utils/Dialog";
 import { addForgot } from "../utils/forgotSlice";
+import { addOtp } from "../utils/otpSlice";
 const Web_ClientId =
   "627812142753-bde51a0nu2cop3ji87n7qrd3tqlkok9j.apps.googleusercontent.com";
 const Login = () => {
@@ -17,6 +18,7 @@ const Login = () => {
   const [errorPassword, setErrorPassword] = useState("");
   const [loginStatus, setLoginStatus] = useState(""); // "success", "error"
   const theme = useSelector((state) => state.theme);
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -26,6 +28,7 @@ const Login = () => {
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
 
   // for error
   function validationFields() {
@@ -52,6 +55,7 @@ const Login = () => {
 
     try {
       if (validationFields()) {
+        setLoading(true);
         const res = await axios.post(
           BASE_URL + "/login",
           {
@@ -109,9 +113,13 @@ const Login = () => {
         });
       }
     }
+    finally{
+      setLoading(false);
+    }
   };
   const handleGoogleLogin = async (token) => {
     try {
+      setLoading(true);
       const res = await axios.post(
         BASE_URL + "/google-auth",
         {
@@ -175,6 +183,9 @@ const Login = () => {
           onClose: closeDialog,
         });
       }
+    }
+    finally{
+      setLoading(false);
     }
   };
   const closeDialog = () => {
@@ -253,6 +264,7 @@ const Login = () => {
           <div className="card-actions justify-center my-2">
             <div
               onClick={() => {
+                dispatch(addOtp(false));
                 dispatch(addForgot(true));
                 navigate("/otpverification");
               }}
@@ -276,7 +288,11 @@ const Login = () => {
           </div>
           <p
             className="m-auto cursor-pointer py-2"
-            onClick={() => navigate("/signup")}
+            onClick={() => {
+                dispatch(addOtp(true));
+                navigate("/otpverification");
+            }
+            }
             style={{ color: theme === "dark" ? "#ffffff" : "black" }}
           >
             New User? Signup Here
@@ -288,19 +304,28 @@ const Login = () => {
               alignItems: "center",
             }}
           >
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                console.log(credentialResponse);
-                handleGoogleLogin(credentialResponse);
-              }}
-              onError={() => {
-                console.log("Login Failed");
-              }}
-              theme="filled_blue" // or 'filled_blue', 'filled_black'
-              size="large"
-              text="signin_with"
-              width="100"
-            />
+            <GoogleOAuthProvider clientId={Web_ClientId}>
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  console.log(credentialResponse);
+                  handleGoogleLogin(credentialResponse);
+                }}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
+                theme="filled_blue" // or 'filled_blue', 'filled_black'
+                size="large"
+                text="signin_with"
+                width="100"
+                containerProps={{
+                  style: {
+                    backgroundColor: "transparent",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                  },
+                }}
+              />
+            </GoogleOAuthProvider>
           </div>
         </div>
       </div>
@@ -312,6 +337,11 @@ const Login = () => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+        {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

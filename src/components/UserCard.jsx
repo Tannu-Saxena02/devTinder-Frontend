@@ -5,9 +5,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 import Dialog from "../utils/Dialog";
 
-const UserCard = ({ user }) => {
-  const { _id, firstName, lastName, photoUrl, age, gender, about } = user;
+const UserCard = ({ user,isShowButton}) => {
+  const {
+    _id,
+    firstName,
+    lastName,
+    photoUrl,
+    age,
+    gender,
+    about,
+  } = user;
   const theme = useSelector((state) => state.theme);
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -18,6 +27,7 @@ const UserCard = ({ user }) => {
   const dispatch = useDispatch();
   const handleSendRequest = async (status, userId) => {
     try {
+      setLoading(true);
       const res = await axios.post(
         BASE_URL + "/request/send/" + status + "/" + userId,
         {},
@@ -70,6 +80,8 @@ const UserCard = ({ user }) => {
           onClose: closeDialog,
         });
       }
+    } finally {
+      setLoading(false);
     }
   };
   const closeDialog = () => {
@@ -104,20 +116,22 @@ const UserCard = ({ user }) => {
         >
           {about}
         </div>
-        <div className="card-actions flex justify-center mt-auto">
-          <button
-            className="btn btn-primary"
-            onClick={() => handleSendRequest("ignored", _id)}
-          >
-            Ignore
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => handleSendRequest("interested", _id)}
-          >
-            Interested
-          </button>
-        </div>
+        {isShowButton ? (
+          <div className="card-actions flex justify-center mt-auto">
+            <button
+              className="btn btn-primary"
+              onClick={() => handleSendRequest("ignored", _id)}
+            >
+              Ignore
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => handleSendRequest("interested", _id)}
+            >
+              Interested
+            </button>
+          </div>
+        ) : null}
       </div>
       {dialog.isOpen && (
         <Dialog
@@ -127,6 +141,11 @@ const UserCard = ({ user }) => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+      {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

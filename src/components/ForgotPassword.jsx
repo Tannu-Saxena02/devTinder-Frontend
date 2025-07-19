@@ -10,11 +10,7 @@ const ForgotPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
-
-  //   const [oldPassword, setOldPassword] = useState("");
-  //   const [newPassword, setNewPassword] = useState("");
-  //   const [oldPasswordError, setOldPasswordError] = useState("");
-  //   const [newPasswordError, setNewPasswordError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -65,6 +61,7 @@ const ForgotPassword = () => {
   async function handleForgot() {
     try {
       if (validationFields()) {
+        setLoading(true);
         const storedEmail = localStorage.getItem("emailId");
         console.log(storedEmail + " " + confirmPassword);
 
@@ -133,10 +130,14 @@ const ForgotPassword = () => {
         });
       }
     }
+    finally{
+      setLoading(false);
+    }
   }
   async function handleReset() {
     try {
       if (validationFields()) {
+        setLoading(true);
         const res = await axios.post(
           BASE_URL + "/resetpassword",
           {
@@ -201,6 +202,9 @@ const ForgotPassword = () => {
           onClose: closeDialog,
         });
       }
+    }
+    finally{
+      setLoading(false);
     }
   }
   const closeDialog = () => {
@@ -310,6 +314,11 @@ const ForgotPassword = () => {
             onClose={dialog.onClose}
           />
         )}
+          {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
+      )}
       </div>
     </div>
   );

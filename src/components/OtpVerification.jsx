@@ -8,6 +8,7 @@ import { BASE_URL } from "../utils/constants";
 const OtpVerification = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
   const theme = useSelector((state) => state.theme);
+  const isOtpSignin = useSelector((state) => state.otp);
   const inputRefs = useRef([]);
   const [timer, setTimer] = useState(10);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
@@ -15,6 +16,7 @@ const OtpVerification = () => {
   const [emailId, setEmailId] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -59,7 +61,12 @@ const OtpVerification = () => {
       inputRefs.current[index + 1]?.focus();
     }
   };
-
+  async function handleResend(){
+   await handleSendOtp();
+   if (!loading) {
+    startTimer();
+   }
+  }
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -80,10 +87,12 @@ const OtpVerification = () => {
   async function handleSendOtp() {
     try {
       if (validationFields()) {
+        setLoading(true);
         const res = await axios.post(
           BASE_URL + "/sendOTP",
           {
             email: emailId,
+            purpose:isOtpSignin?"":"forgot"
           },
           { withCredentials: true }
         );
@@ -134,6 +143,9 @@ const OtpVerification = () => {
         });
       }
     }
+    finally{
+      setLoading(false);
+    }
   }
   const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
@@ -143,6 +155,7 @@ const OtpVerification = () => {
     console.log(emailId + " " + otp + " " + enteredOtp);
     try {
       if (enteredOtp) {
+        setLoading(true);
         const res = await axios.post(
           BASE_URL + "/verifyOTP",
           {
@@ -152,7 +165,8 @@ const OtpVerification = () => {
           { withCredentials: true }
         );
         if (res.data.success) {
-          if (res.data.message.length >= 0) navigate("/forgotpassword");
+          if (res.data.message.length >= 0)
+            isOtpSignin?navigate("/signup"): navigate("/forgotpassword");
         } else {
           setDialog({
             status: false,
@@ -204,6 +218,9 @@ const OtpVerification = () => {
           onClose: closeDialog,
         });
       }
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -341,7 +358,7 @@ const OtpVerification = () => {
           {isOtp ? (
             <button
               className="text-center text-sm text-blue-600 cursor-pointer justify-center mx-auto w-fit block my-3"
-              onClick={startTimer}
+              onClick={handleResend}
               disabled={timer > 0 ? true : false}
             >
               Resend OTP
@@ -357,6 +374,11 @@ const OtpVerification = () => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+       {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

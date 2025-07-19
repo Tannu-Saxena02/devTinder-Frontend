@@ -4,7 +4,7 @@ import cloud from "../assets/cloud.webp";
 import network from "../assets/network.webp";
 import encrpt from "../assets/networks.webp";
 import mode from "../assets/mode.png";
-import system from "../assets/network.webp";
+import system from "../assets/chatpartners.png";
 
 import OnetoOne from "../assets/onetoones.png";
 import photo from "../assets/photo.jpg";
@@ -73,35 +73,35 @@ const LandingPage = () => {
     },
     {
       id: 2,
-      img: chatcomm,
-      desc: "Enables instant, bidirectional communication between matched users..",
-    },
-    {
-      id: 3,
       img: photo,
       desc: "Supports sharing of images, videos, and potentially voice notes within chats.",
     },
     {
-      id: 4,
+      id: 3,
       img: sticker,
       desc: "Emoji and Sticker Support: Offers a fun way for users to express themselves.",
     },
     {
-      id: 5,
+      id: 4,
       img: system,
-      desc: "Presents potential chat partners (or groups/topics) as visually appealing, swipeable cards, similar to the content cards in your screenshot",
+      desc: "Presents potential chat partners (or groups/topics) as visually appealing cards, similar to the content cards",
     },
     {
-      id: 6,
+      id: 5,
       img: premium,
       desc: "Premium Subscriptions: Offers enhanced features for paying users (e.g., unlimited swipes, seeing who liked them, profile boosts).",
     },
     {
-      id: 7,
+      id: 6,
       img: userStatus,
       desc: "User Status (online/offline): Provides visual cues for message progression.",
     },
     {
+      id: 7,
+      img: chatcomm,
+      desc: "Enables instant, bidirectional communication between matched users.",
+    },
+      {
       id: 8,
       img: lastseen,
       desc: "Last seen Indicators: Shows when the other person is actively typing a message, enhancing the real-time feel.",

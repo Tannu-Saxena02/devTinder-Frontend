@@ -18,6 +18,7 @@ const Signup = () => {
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const theme = useSelector((state) => state.theme);
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -59,6 +60,7 @@ const Signup = () => {
   const handleSignUp = async () => {
     try {
       if (validationFields()) {
+        setLoading(true);
         const res = await axios.post(
           BASE_URL + "/signup",
           { firstName, lastName, emailId, password },
@@ -117,6 +119,9 @@ const Signup = () => {
           onClose: closeDialog,
         });
       }
+    }
+    finally{
+      setLoading(false);
     }
   };
   const closeDialog = () => {
@@ -282,6 +287,11 @@ const Signup = () => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+       {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

@@ -25,6 +25,7 @@ const Chat = ({ onSend }) => {
   const messagesEndRef = useRef(null);
   const theme = useSelector((state) => state.theme);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -72,6 +73,7 @@ const Chat = ({ onSend }) => {
   };
   const fetchChatMessages = async () => {
     try {
+      setLoading(true);
       const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
         withCredentials: true,
       });
@@ -134,6 +136,9 @@ const Chat = ({ onSend }) => {
         });
       }
     }
+    finally{
+      setLoading(false);
+    }
   };
   const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
@@ -190,6 +195,8 @@ const Chat = ({ onSend }) => {
           onClose: closeDialog,
         });
       }
+    }
+    finally{
     }
   };
 
@@ -450,7 +457,8 @@ const Chat = ({ onSend }) => {
               sendMessage(); // call your send function
             }
           }}
-          className="flex-1 border border-gray-500 text-white rounded p-2"
+         className={`flex-1 border border-gray-500 ${theme === "dark" ? "text-white" : "text-black"} rounded p-2`}
+
         ></input>
         <button
           onClick={() => setShowPicker((prev) => !prev)}
@@ -489,6 +497,11 @@ const Chat = ({ onSend }) => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+       {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

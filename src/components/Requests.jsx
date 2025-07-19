@@ -11,6 +11,7 @@ const Requests = () => {
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -20,6 +21,7 @@ const Requests = () => {
   });
   const fetchRequests = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
       });
@@ -71,6 +73,9 @@ const Requests = () => {
           onClose: closeDialog,
         });
       }
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -243,6 +248,11 @@ const Requests = () => {
           message={dialog.message}
           onClose={dialog.onClose}
         />
+      )}
+       {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
       )}
     </div>
   );

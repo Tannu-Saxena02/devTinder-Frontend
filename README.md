@@ -63,14 +63,24 @@ beautify Ui and responsiveness
 Drawer Implementation(later)
 AI Asistant for FAQ
 
- TODO backend:
-validation and code correction backend(testing)
-payment gateway 
+ # TODO backend:
+ Goggle auth for production -always show profile screen
+ images on landing page & carousel
+ registration flow->send otp  (done)
+ frontend issue->on reload login sign up visible (done)
+ on every page reloads api hit show network error (done)
+ loader. (done)
+ profile validation on textinput (check on all screen)(done)
+ forgot pr email exits then no email trigger(done)
+ on reload light theme->black theme (done)
+ on white theme when we click on devconnect it shows black (done)
+ payment gateway 
 
+
+validation and code correction backend(testing)
 otp Send API & verify otp API (done)
 : https://dev.to/manthanank/building-an-otp-verification-system-with-nodejs-and-mongodb-2p0o
 - read about SMTP server and how it work with send mail
-Goggle auth API (done)
 deployment  (done)
 chat Feature. (done)
 

@@ -154,6 +154,7 @@ const Privacy = () => {
             <div className="flex justify-between items-center mt-6 gap-4">
               <button
                 className="btn btn-outline btn-sm"
+                style={{ color: theme === "dark" ? "#ffffff" : "black" }}
                 onClick={scrollToBottom}
               >
                 Scroll to Bottom

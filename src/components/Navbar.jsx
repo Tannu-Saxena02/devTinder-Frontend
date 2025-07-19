@@ -1,5 +1,5 @@
 import axios from "axios";
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
@@ -23,6 +23,7 @@ const Navbar = () => {
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -32,7 +33,8 @@ const Navbar = () => {
   });
   const handleLogout = async () => {
     try {
-      const res=await axios.post(
+      setLoading(true);
+      const res = await axios.post(
         BASE_URL + "/logout",
         {},
         {
@@ -96,8 +98,11 @@ const Navbar = () => {
         });
       }
     }
+    finally{
+      setLoading(false);
+    }
   };
-    const closeDialog = () => {
+  const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
   const toggleTheme = () => {
@@ -112,13 +117,15 @@ const Navbar = () => {
         style={{ backgroundColor: theme === "dark" ? "black" : "#ffffff" }}
       >
         <div className="flex-1">
-          <Link className="btn btn-ghost text-xl" to="/">
+          <Link 
+           className="flex items-center text-xl px-2 ml-2 py-1 rounded hover:bg-transparent focus:bg-transparent active:bg-transparent border-none"
+           to="/">
             <img
               alt="User Avatar"
               className="w-10 h-10 rounded-full"
               src={applogo}
             />
-            <div className="mx-2" style={{ color: "#feba00" }}>
+            <div className="mx-2" style={{ color: "#feba00",fontWeight:"600" }}>
               DevConnect
             </div>
           </Link>
@@ -130,7 +137,7 @@ const Navbar = () => {
                 className="mx-5 text-[14px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
                 style={{
                   fontWeight: "500",
-                  color: "#ffffff",
+                  color: theme === "dark" ? "#ffffff" : "black",
                 }}
                 onClick={() => {
                   navigate("/login");
@@ -142,7 +149,7 @@ const Navbar = () => {
             <Link className="justify-between" to="/signup">
               <div
                 className="text-[14px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
-                style={{ fontWeight: "400", color: "#ffffff" }}
+                style={{ fontWeight: "400",  color: theme === "dark" ? "#ffffff" : "black", }}
                 onClick={() => {
                   navigate("/signup");
                 }}

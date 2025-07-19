@@ -10,6 +10,8 @@ const Feed = () => {
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const feed = useSelector((store) => store.feed);
+  const [loading, setLoading] = useState(false);
+  const [isShowButton, setIsShowButton] = useState(true)
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -22,6 +24,7 @@ const Feed = () => {
   }, []);
   const getFeed = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(BASE_URL + "/feed", {
         withCredentials: true,
       });
@@ -74,6 +77,9 @@ const Feed = () => {
         });
       }
     }
+    finally{
+      setLoading(false)
+    }
   };
   const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
@@ -95,7 +101,7 @@ const Feed = () => {
   return (
     feed && (
       <div className="flex justify-center my-10">
-        <UserCard user={feed[0]} />
+        <UserCard user={feed[0]} isShowButton={true} />
         {dialog.isOpen && (
           <Dialog
             status={dialog.status}
@@ -105,6 +111,11 @@ const Feed = () => {
             onClose={dialog.onClose}
           />
         )}
+          {loading && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+          <span className="loading loading-spinner loading-xl text-green-500"></span>
+        </div>
+      )}
       </div>
     )
   );

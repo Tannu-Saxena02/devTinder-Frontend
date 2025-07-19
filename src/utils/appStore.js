@@ -7,6 +7,7 @@ import themeReducer from "./themeSlice";
 import termsReducer from "./termsSlice.js";
 import privacyReducer from "./privacySlice.js";
 import forgotReducer from "./forgotSlice.js";
+import otpReducer from "./otpSlice.js";
 
 const appStore = configureStore({
   reducer: {
@@ -17,7 +18,9 @@ const appStore = configureStore({
     theme: themeReducer,
     isterms: termsReducer,
     isprivacy: privacyReducer,
-    forgot:forgotReducer
+    forgot:forgotReducer,
+    otp:otpReducer
+    
   },
 });
 export default appStore;
