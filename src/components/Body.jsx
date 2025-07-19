@@ -24,6 +24,8 @@ const Body = () => {
   });
   const fetchUser = async () => {
     const isLoggedIn = document.cookie.includes("token");
+    console.log("view res"+userData+" "+isLoggedIn);
+    
     if (userData || !isLoggedIn) return;// on reload data will be lost
     try {
       setLoading(true);

@@ -113,7 +113,7 @@ chat Feature. (done)
  - pm2 start npm --name "devTinder-backend" -- start
  - pm2 logs
  - pm2 list, pm2 flush <name>, pm2 stop <name>, pm2 delete<name> or pm2 restart 0
- - config nginx -> sudo nano /etc/nginx/sites-available/default (for config nginx that in # Nginx config)
+ - for config nginx -> sudo nano /etc/nginx/sites-available/default (for config nginx that in # Nginx config)
  - restart nginx -> sudo systemctl restart nginx
  - Modify the BASEURL in frontend project to "/api"
  # for dotenv setup on server
