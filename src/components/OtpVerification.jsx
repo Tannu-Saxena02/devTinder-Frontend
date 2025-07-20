@@ -104,7 +104,7 @@ const OtpVerification = () => {
             status: false,
             isOpen: true,
             title: "Error",
-            message: res?.data?.message,
+            message: res?.data?.error,
             onClose: closeDialog,
           });
         }

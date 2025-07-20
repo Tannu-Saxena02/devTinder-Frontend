@@ -39,7 +39,7 @@ const Feed = () => {
           status: false,
           isOpen: true,
           title: "Error",
-          message: res?.data,
+          message: res?.data?.error,
           onClose: closeDialog,
         });
       }

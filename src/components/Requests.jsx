@@ -36,7 +36,7 @@ const Requests = () => {
           status: false,
           isOpen: true,
           title: "Error",
-          message: res?.data,
+          message: res?.data?.error,
           onClose: closeDialog,
         });
       }
@@ -88,7 +88,7 @@ const Requests = () => {
   };
   const reviewRequest = async (status, _id) => {
     try {
-      const res = axios.post(
+      const res = await axios.post(
         BASE_URL + "/request/review/" + status + "/" + _id,
         {},
         { withCredentials: true }
@@ -105,7 +105,6 @@ const Requests = () => {
             message: res?.data?.message,
             onClose: () => {
               closeDialog();
-              navigate("/login");
             },
           });
         }

@@ -98,7 +98,7 @@ const Chat = ({ onSend }) => {
           status: false,
           isOpen: true,
           title: "Error",
-          message: chat?.data,
+          message: chat?.data?.error,
           onClose: closeDialog,
         });
       }
@@ -158,7 +158,7 @@ const Chat = ({ onSend }) => {
           status: false,
           isOpen: true,
           title: "Error",
-          message: res?.data,
+          message: res?.data?.error,
           onClose: closeDialog,
         });
       }

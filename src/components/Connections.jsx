@@ -18,6 +18,14 @@ const Connections = () => {
     message: "",
     onClose: null,
   });
+
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
+  };
   const fetchConnections = async () => {
     try {
       setLoading(true);
@@ -35,7 +43,7 @@ const Connections = () => {
           status: false,
           isOpen: true,
           title: "Error",
-          message: res?.data,
+          message: res?.data?.error,
           onClose: closeDialog,
         });
       }
@@ -55,6 +63,7 @@ const Connections = () => {
             },
           });
         } else {
+          console.log(err?.response?.data?.error);
           setDialog({
             status: false,
             isOpen: true,
@@ -72,18 +81,10 @@ const Connections = () => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
-  const closeDialog = () => {
-    setDialog((prev) => ({ ...prev, isOpen: false }));
-  };
-  useEffect(() => {
-    fetchConnections();
-  }, []);
-
   if (!connections) return;
 
   if (connections.length === 0)
@@ -171,7 +172,7 @@ const Connections = () => {
           onClose={dialog.onClose}
         />
       )}
-       {loading && (
+      {loading && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
           <span className="loading loading-spinner loading-xl text-green-500"></span>
         </div>
