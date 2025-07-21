@@ -17,6 +17,7 @@ import { IoHome } from "react-icons/io5";
 import { MdLockReset } from "react-icons/md";
 import { addForgot } from "../utils/forgotSlice";
 import Dialog from "../utils/Dialog";
+import { MdOutlineWorkspacePremium } from "react-icons/md";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
@@ -268,6 +269,22 @@ const Navbar = () => {
                       }}
                     >
                       Requests
+                    </div>
+                  </Link>
+                </li>
+                 <li>
+                  <Link to="/premium">
+                    <MdOutlineWorkspacePremium
+                      size={20}
+                      color={theme === "dark" ? "#ffffff" : "black"}
+                    />
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: theme === "dark" ? "#ffffff" : "black",
+                      }}
+                    >
+                      Premium
                     </div>
                   </Link>
                 </li>

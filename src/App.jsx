@@ -19,6 +19,7 @@ import LandingPage from "./components/LandingPage";
 import Signup from "./components/Signup";
 import ForgotPassword from "./components/ForgotPassword";
 import Requests from "./components/Requests";
+import Premium from "./components/Premium";
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
               <Route path="otpverification" element={<OtpVerification />} />
               <Route path="forgotpassword" element={<ForgotPassword/>} />
               <Route path="resetpassword" element={<ForgotPassword/>} />
+              <Route path="premium" element={<Premium />} />
             </Route>
           </Routes>
         </BrowserRouter>

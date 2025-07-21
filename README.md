@@ -168,3 +168,20 @@ sm:text-[16px] → overrides on screens ≥ 640px (small devices & up)
 md:text-[18px] → overrides on screens ≥ 768px (medium devices & up)
 
 lg:text-[20px] → overrides on screens ≥ 1024px (large devices & up)
+
+# Payment Gateway Integration
+- signup on Razorpay and complete KYC
+- created a UI for presmium page
+- creating an API for create order in backend
+- added my key and secret in env file
+- initilize Razorpay in utils
+- creating orders on Razorpay
+- create shema and models
+- saved the orders in Payment collections
+- make the API dynamic
+- setup Rzorpay webhooks on our live APIs
+- Ref - https://github.com/razorpay/razorpay-node/tree/master/documents
+- Ref - https://razorpay.com/docs/payments/server-integration/nodejs/integration-steps/#integrate-with-razorpay-payment-gateway
+- Ref - https://razorpay.com/docs/webhooks/validate-test/
+- Ref - https://razorpay.com/docs/webhooks/payloads/payments/
+
