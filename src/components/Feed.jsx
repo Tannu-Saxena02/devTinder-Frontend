@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../utils/feedSlice";
 import UserCard from "./UserCard";
 import Dialog from "../utils/Dialog";
+import { useNavigate } from "react-router-dom";
 
 const Feed = () => {
   const theme = useSelector((state) => state.theme);
@@ -12,6 +13,7 @@ const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const [loading, setLoading] = useState(false);
   const [isShowButton, setIsShowButton] = useState(true)
+  const navigate = useNavigate();
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -84,8 +86,8 @@ const Feed = () => {
   const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
-  if (!feed) return;
-  if (feed.length <= 0)
+  // if (!feed) return;
+  if (feed?.length <= 0)
     return (
       <h1
         className="flex justify-center my-10"
@@ -99,9 +101,11 @@ const Feed = () => {
     );
 
   return (
-    feed && (
+   
       <div className="flex justify-center my-10">
+        { feed && (
         <UserCard user={feed[0]} isShowButton={true} />
+         )}
         {dialog.isOpen && (
           <Dialog
             status={dialog.status}
@@ -117,7 +121,6 @@ const Feed = () => {
         </div>
       )}
       </div>
-    )
   );
 };
 

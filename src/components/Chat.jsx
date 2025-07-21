@@ -302,23 +302,23 @@ const Chat = ({ onSend }) => {
         <div className="w-10 h-10 rounded-full overflow-hidden mx-2">
           <img
             alt="User profile"
-            src={status.photoUrl}
+            src={status?.photoUrl}
             className="w-full h-full object-cover"
           />
         </div>
         <div className="flex flex-col">
-          {status.firstName && status.lastName && (
+          {status?.firstName && status?.lastName && (
             <div
               style={{
                 color: theme === "dark" ? "#ffffff" : "black",
                 fontWeight: "500",
               }}
             >
-              {status.firstName + " " + status.lastName}
+              {status?.firstName + " " + status?.lastName}
             </div>
           )}
           <div className="flex flex-row items-center py-1">
-            {status.isOnline ? (
+            {status?.isOnline ? (
               <div className="flex items-center">
                 <span className="h-3 w-3 rounded-full bg-green-500 mr-2"></span>
                 <span
@@ -329,9 +329,11 @@ const Chat = ({ onSend }) => {
                 </span>
               </div>
             ) : (
-              <span className="h-3 w-3 rounded-full bg-yellow-400"></span>
+              <span className="h-3 w-3 rounded-full bg-yellow-400">
+                Offline
+              </span>
             )}
-            {status.lastSeen && !status.isOnline && (
+            {status?.lastSeen && !status?.isOnline && (
               <div
                 className="mx-2"
                 style={{
@@ -339,7 +341,7 @@ const Chat = ({ onSend }) => {
                   color: theme === "dark" ? "#ffffff" : "black",
                 }}
               >
-                {getLastSeenText(status.lastSeen)}
+                {getLastSeenText(status?.lastSeen)}
               </div>
             )}
           </div>
@@ -354,7 +356,7 @@ const Chat = ({ onSend }) => {
       ></div>
 
       <div className="flex-1 overflow-scroll p-5">
-        {messages.map((msg, index) => {
+        {messages?.map((msg, index) => {
           const currentDate = getDate(msg.createdAt);
           const prevDate =
             index > 0 ? getDate(messages[index - 1].createdAt) : null;
@@ -418,7 +420,7 @@ const Chat = ({ onSend }) => {
                     View Document
                   </a>
                 )}
-                {msg.createdAt && (
+                {msg?.createdAt && (
                   <time
                     className="chat-footer opacity-50 text-left"
                     style={{
@@ -428,7 +430,7 @@ const Chat = ({ onSend }) => {
                       color: theme === "dark" ? "#ffffff" : "black",
                     }}
                   >
-                    {getTime(msg.createdAt)}
+                    {getTime(msg?.createdAt)}
                   </time>
                 )}
               </div>

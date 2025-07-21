@@ -5,12 +5,14 @@ import { connect, useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
 import { Link } from "react-router-dom";
 import Dialog from "../utils/Dialog";
+import { useNavigate } from "react-router-dom";
 
 const Connections = () => {
   const connections = useSelector((store) => store.connections);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
@@ -85,9 +87,9 @@ const Connections = () => {
       setLoading(false);
     }
   };
-  if (!connections) return;
+  // if (!connections) return;
 
-  if (connections.length === 0)
+  if (connections?.length === 0)
     return (
       <h1
         className="flex justify-center my-10"
@@ -113,7 +115,7 @@ const Connections = () => {
         Connections
       </h1>
 
-      {connections.map((connection) => {
+      {connections?.map((connection) => {
         const { _id, firstName, lastName, photoUrl, age, gender, about } =
           connections != null ? connection : {};
 

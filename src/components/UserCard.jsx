@@ -4,6 +4,7 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 import Dialog from "../utils/Dialog";
+import { useNavigate } from "react-router-dom";
 
 const UserCard = ({ user,isShowButton}) => {
   const {
@@ -17,6 +18,7 @@ const UserCard = ({ user,isShowButton}) => {
   } = user;
   const theme = useSelector((state) => state.theme);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [dialog, setDialog] = useState({
     status: false,
     isOpen: false,
