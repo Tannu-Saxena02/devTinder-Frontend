@@ -12,7 +12,6 @@ const Feed = () => {
   const dispatch = useDispatch();
   const feed = useSelector((store) => store.feed);
   const [loading, setLoading] = useState(false);
-  const [isShowButton, setIsShowButton] = useState(true)
   const navigate = useNavigate();
   const [dialog, setDialog] = useState({
     status: false,
@@ -78,9 +77,8 @@ const Feed = () => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   const closeDialog = () => {
@@ -101,26 +99,23 @@ const Feed = () => {
     );
 
   return (
-   
-      <div className="flex justify-center my-10">
-        { feed && (
-        <UserCard user={feed[0]} isShowButton={true} />
-         )}
-        {dialog.isOpen && (
-          <Dialog
-            status={dialog.status}
-            isOpen={dialog.isOpen}
-            title={dialog.title}
-            message={dialog.message}
-            onClose={dialog.onClose}
-          />
-        )}
-          {loading && (
+    <div className="flex justify-center my-10">
+      {feed && <UserCard user={feed[0]} isShowButton={true} />}
+      {dialog.isOpen && (
+        <Dialog
+          status={dialog.status}
+          isOpen={dialog.isOpen}
+          title={dialog.title}
+          message={dialog.message}
+          onClose={dialog.onClose}
+        />
+      )}
+      {loading && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
           <span className="loading loading-spinner loading-xl text-green-500"></span>
         </div>
       )}
-      </div>
+    </div>
   );
 };
 

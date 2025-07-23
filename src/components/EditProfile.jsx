@@ -15,6 +15,7 @@ const EditProfile = ({ user }) => {
   const [age, setAge] = useState(user.age || "");
   const [gender, setGender] = useState(user.gender || "");
   const [about, setAbout] = useState(user.about || "");
+  const [isPremium, setIsPremium] = useState(user?.isPremium);
   const [error, setError] = useState("");
   const [aboutError, setAboutError] = useState("");
   const [firstNameError, setFirstNameError] = useState("");
@@ -36,13 +37,11 @@ const EditProfile = ({ user }) => {
     onClose: null,
   });
 
- 
-
- function validateInput(val) {
+  function validateInput(val) {
     // Validation
-     const values = (val === "" || val === undefined) ? user.about : val;
-     console.log(values+" >> "+val+">> "+user.about);
-     
+    const values = val === "" || val === undefined ? user.about : val;
+    console.log(values + " >> " + val + ">> " + user.about);
+
     const words = values.trim().split(/\s+/);
     const charCount = values.length;
 
@@ -178,9 +177,8 @@ const EditProfile = ({ user }) => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   const closeDialog = () => {
@@ -375,7 +373,7 @@ const EditProfile = ({ user }) => {
                     backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
                     color: theme === "dark" ? "#ffffff" : "black",
                   }}
-                onChange={(e) => handleChange(e.target.value)}
+                  onChange={(e) => handleChange(e.target.value)}
                 />
                 {aboutError && (
                   <p style={{ color: "red", fontSize: 13, marginTop: "1%" }}>
@@ -392,7 +390,16 @@ const EditProfile = ({ user }) => {
           </div>
         </div>
         <UserCard
-          user={{ firstName, lastName, photoUrl, age, gender, about,isShowButton}}
+          user={{
+            firstName,
+            lastName,
+            photoUrl,
+            age,
+            gender,
+            about,
+            isPremium,
+            isShowButton,
+          }}
         />
       </div>
       {showToast && (
@@ -411,7 +418,7 @@ const EditProfile = ({ user }) => {
           onClose={dialog.onClose}
         />
       )}
-       {loading && (
+      {loading && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
           <span className="loading loading-spinner loading-xl text-green-500"></span>
         </div>

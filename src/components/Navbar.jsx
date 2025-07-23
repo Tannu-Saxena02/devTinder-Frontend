@@ -18,6 +18,7 @@ import { MdLockReset } from "react-icons/md";
 import { addForgot } from "../utils/forgotSlice";
 import Dialog from "../utils/Dialog";
 import { MdOutlineWorkspacePremium } from "react-icons/md";
+import { MdVerifiedUser } from "react-icons/md";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
@@ -98,8 +99,7 @@ const Navbar = () => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -118,15 +118,19 @@ const Navbar = () => {
         style={{ backgroundColor: theme === "dark" ? "black" : "#ffffff" }}
       >
         <div className="flex-1">
-          <Link 
-           className="flex items-center text-xl px-2 ml-2 py-1 rounded hover:bg-transparent focus:bg-transparent active:bg-transparent border-none"
-           to="/">
+          <Link
+            className="flex items-center text-xl px-2 ml-2 py-1 rounded hover:bg-transparent focus:bg-transparent active:bg-transparent border-none"
+            to="/"
+          >
             <img
               alt="User Avatar"
               className="w-10 h-10 rounded-full"
               src={applogo}
             />
-            <div className="mx-2" style={{ color: "#feba00",fontWeight:"600" }}>
+            <div
+              className="mx-2"
+              style={{ color: "#feba00", fontWeight: "600" }}
+            >
               DevConnect
             </div>
           </Link>
@@ -150,7 +154,10 @@ const Navbar = () => {
             <Link className="justify-between" to="/signup">
               <div
                 className="text-[14px] sm:text-[13px] md:text-[15px] lg:text-[17px]"
-                style={{ fontWeight: "400",  color: theme === "dark" ? "#ffffff" : "black", }}
+                style={{
+                  fontWeight: "400",
+                  color: theme === "dark" ? "#ffffff" : "black",
+                }}
                 onClick={() => {
                   navigate("/signup");
                 }}
@@ -183,6 +190,13 @@ const Navbar = () => {
                     alt="Tailwind CSS Navbar component"
                     src={user.photoUrl}
                   />
+                  {user?.isPremium ? (
+                    <MdVerifiedUser
+                      size={20}
+                      color={theme === "dark" ? "#00BF82" : "green"}
+                      className="absolute -bottom-1 -right-2  rounded-full"
+                    />
+                  ) : null}
                 </div>
               </div>
               <ul
@@ -272,7 +286,7 @@ const Navbar = () => {
                     </div>
                   </Link>
                 </li>
-                 <li>
+                <li>
                   <Link to="/premium">
                     <MdOutlineWorkspacePremium
                       size={20}

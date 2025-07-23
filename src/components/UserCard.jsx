@@ -5,17 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 import Dialog from "../utils/Dialog";
 import { useNavigate } from "react-router-dom";
+import { MdVerifiedUser } from "react-icons/md";
 
-const UserCard = ({ user,isShowButton}) => {
-  const {
-    _id,
-    firstName,
-    lastName,
-    photoUrl,
-    age,
-    gender,
-    about,
-  } = user;
+const UserCard = ({ user, isShowButton }) => {
+  const { _id, firstName, lastName, photoUrl, age, gender, about, isPremium } =
+    user;
   const theme = useSelector((state) => state.theme);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -98,11 +92,20 @@ const UserCard = ({ user,isShowButton}) => {
       <img src={photoUrl} className="h-auto w-full rounded-md" alt="photo" />
 
       <div className="m-4 flex flex-col flex-1">
-        <div
-          className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]"
-          style={{ color: theme === "dark" ? "#ffffff" : "black" }}
-        >
-          {firstName + " " + lastName}
+        <div className="flex flex-row">
+          <div
+            className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]"
+            style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+          >
+            {firstName + " " + lastName}
+          </div>
+          {isPremium && (
+            <MdVerifiedUser
+              size={22}
+              color={theme === "dark" ? "#00BF82" : "green"}
+              style={{ marginLeft: "10px", marginTop: "1px" }}
+            />
+          )}
         </div>
         {age && gender && (
           <div
