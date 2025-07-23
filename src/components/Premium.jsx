@@ -17,6 +17,7 @@ const Premium = () => {
   const [isUserPremium, setIsUserPremium] = useState(false);
   const theme = useSelector((state) => state.theme);
   const [premiumText, setPremiumText] = useState("false");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     let ispremiumText = localStorage.getItem("premiumText");
@@ -32,42 +33,134 @@ const Premium = () => {
       },
       { withCredentials: true }
     );
-
-    const { amount, currency, notes, orderId } = order?.data?.data;
-    const { keyId } = order?.data;
-    const options = {
-      key: keyId,
-      amount,
-      currency,
-      name: "Dev Tinder",
-      description: "Connect to other developers",
-      order_id: orderId,
-      prefill: {
-        name: notes?.firstName + " " + notes?.lastName,
-        email: notes?.emailId,
-        contact: "9999999999",
-      },
-      handler: async function (response) {
-        await verifyPremiumUser();
-        localStorage.setItem("premiumText", "false");
-        setPremiumText("false");
-      },
-      theme: {
-        color: "#F37254",
-      },
-    };
-    console.log("amount>>", amount + JSON.stringify(order.data?.data));
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+    try {
+      if (order.data.success) {
+        const { amount, currency, notes, orderId } = order?.data?.data;
+        const { keyId } = order?.data;
+        const options = {
+          key: keyId,
+          amount,
+          currency,
+          name: "Dev Tinder",
+          description: "Connect to other developers",
+          order_id: orderId,
+          prefill: {
+            name: notes?.firstName + " " + notes?.lastName,
+            email: notes?.emailId,
+            contact: "9999999999",
+          },
+          handler: async function (response) {
+            await verifyPremiumUser();
+            localStorage.setItem("premiumText", "false");
+            setPremiumText("false");
+          },
+          theme: {
+            color: "#F37254",
+          },
+        };
+        console.log("amount>>", amount + JSON.stringify(order.data?.data));
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const verifyPremiumUser = async () => {
     const res = await axios.get(BASE_URL + "/premium/verify", {
       withCredentials: true,
     });
-
-    if (res.data.isPremium) {
-      setIsUserPremium(true);
+    try {
+      if (res.data.success) {
+        if (res.data?.data?.isPremium) {
+          setIsUserPremium(true);
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   };
   function onClose() {
@@ -85,41 +178,40 @@ const Premium = () => {
         {isUserPremium && premiumText == "true" ? (
           <div
             className="flex justify-center my-10 "
-            
             style={{ color: theme === "dark" ? "#ffffff" : "black" }}
           >
             You are now a Premium User
           </div>
         ) : (
           <div>
-            <div className="m-10">
-              <div className="flex w-full justify-center items-center">
+            <div className="m-3">
+              <div className="flex flex-col md:flex-row  gap-4 w-full">
                 <div
-                  className="card bg-base-300 rounded-box grid h-80 flex-grow"
+                  className="bg-base-300 rounded-box grid h-80 w-full"
                   style={{
                     backgroundColor: theme === "dark" ? "black" : "#DBDBDB",
                     padding: "2%",
                   }}
                 >
                   <h1
-                    className="font-bold text-3xl justify-center text-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]"
+                    className="font-bold text-3xl justify-center text-center text-[14px] sm:text-[14px] md:text-[24px] lg:text-[30px]"
                     style={{ color: theme === "dark" ? "#ffffff" : "black" }}
                   >
                     Silver Membership
                   </h1>
                   <div className="flex flex-row">
-                    <div className="flex-shrink-0 flex items-center justify-center">
+                    <div className="flex-shrink-0 flex">
                       <img
                         alt="silver"
                         src={silver}
-                        className="lg:w-[200px] lg:h-[200px] sm:w-[30px] sm:h-[30px] md:w-[120px] md:h-[120px]"
+                        className="w-[100px] h-[100px] lg:w-[200px] lg:h-[200px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px]"
                         style={{
                           objectFit: "contain",
                         }}
                       />
                     </div>
 
-                    <ul className="flex-grow flex flex-col mt-10 items-start ml-5">
+                    <ul className="flex-grow flex flex-col items-start  lg:mt-4">
                       <li
                         style={{
                           color: theme === "dark" ? "#ffffff" : "black",
@@ -131,8 +223,7 @@ const Premium = () => {
                           color={theme === "dark" ? "#ffffff" : "black"}
                           className="mr-2"
                         />{" "}
-                        <div 
-                        className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]">
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
                           Chat with other people
                         </div>
                       </li>
@@ -147,8 +238,7 @@ const Premium = () => {
                           className="mr-2"
                           color={theme === "dark" ? "#ffffff" : "black"}
                         />{" "}
-                        <div 
-                        className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]">
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
                           100 connection Requests per day
                         </div>
                       </li>
@@ -163,8 +253,9 @@ const Premium = () => {
                           className="mr-2"
                           color={theme === "dark" ? "#ffffff" : "black"}
                         />{" "}
-                        <div 
-                        className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]">Blue Tick</div>
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
+                          Blue Tick
+                        </div>
                       </li>
                       <li
                         className="flex flex-row m-1"
@@ -177,7 +268,10 @@ const Premium = () => {
                           className="mr-2"
                           color={theme === "dark" ? "#ffffff" : "black"}
                         />{" "}
-                        <div className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]"> 3 months</div>
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
+                          {" "}
+                          3 months
+                        </div>
                       </li>
                     </ul>
                   </div>
@@ -187,13 +281,13 @@ const Premium = () => {
                       alignItems: "center",
                     }}
                     onClick={() => handleBuyClick("silver")}
-                    className="btn btn-secondary mx-auto flex justify-center items-center w-full sm:w-[60%] md:w-[50%] lg:w-[60%] xl:w-[60%]"
+                    className="btn btn-secondary mx-auto flex justify-center items-center w-[80%] sm:w-[60%] md:w-[50%] lg:w-[60%] xl:w-[60%] mb-1"
                   >
                     Buy Silver
                   </button>
                 </div>
 
-                <div className="flex flex-col items-center mx-4 h-70">
+                <div className="hidden sm:flex  flex-col justify-center items-center h-[280px] mt-5">
                   <div
                     className="w-px flex-grow"
                     style={{
@@ -201,7 +295,7 @@ const Premium = () => {
                     }}
                   ></div>
                   <div
-                    className="px-2 text-sm font-semibold text-[9px] sm:text-[9px] md:text-[10px] lg:text-[11px]"
+                    className="text-sm font-semibold text-[9px] sm:text-[9px] md:text-[10px] lg:text-[11px]"
                     style={{
                       color: theme === "dark" ? "#DBDBDB" : "#000000",
                     }}
@@ -217,23 +311,23 @@ const Premium = () => {
                 </div>
 
                 <div
-                  className="card bg-base-300 rounded-box grid h-80 flex-grow"
+                  className="bg-base-300 rounded-box grid h-80 w-full"
                   style={{
                     backgroundColor: theme === "dark" ? "black" : "#DBDBDB",
                     padding: "1%",
                   }}
                 >
                   <h1
-                    className="font-bold text-3xl justify-center text-center mt-4 text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]"
+                    className="font-bold text-3xl justify-center text-center text-[14px] sm:text-[14px] md:text-[24px] lg:text-[30px] mt-5"
                     style={{ color: theme === "dark" ? "#ffffff" : "black" }}
                   >
                     Gold Membership
                   </h1>
                   <div className="flex flex-row">
-                    <div className="flex-shrink-0 flex items-center justify-center">
+                    <div className="flex-shrink-0 flex">
                       <img
                         alt="silver"
-                        className="lg:w-[200px] lg:h-[200px] sm:w-[90px] sm:h-[90px] md:w-[120px] md:h-[120px]"
+                        className="w-[100px] h-[100px] lg:w-[200px] lg:h-[200px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px]"
                         src={gold}
                         style={{
                           objectFit: "contain",
@@ -241,7 +335,7 @@ const Premium = () => {
                       />
                     </div>
 
-                    <ul className="flex-grow flex flex-col mt-10 items-start ml-5">
+                    <ul className="flex-grow flex flex-col items-start lg:mt-4">
                       <li
                         className="flex flex-row m-1"
                         style={{
@@ -253,8 +347,7 @@ const Premium = () => {
                           className="mr-2 "
                           color={theme === "dark" ? "#ffffff" : "black"}
                         />{" "}
-                        <div 
-                        className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]">
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
                           Chat with other people
                         </div>
                       </li>
@@ -269,8 +362,7 @@ const Premium = () => {
                           className="mr-2"
                           color={theme === "dark" ? "#ffffff" : "black"}
                         />{" "}
-                        <div 
-                        className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]">
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
                           1000 connection Requests per day
                         </div>
                       </li>
@@ -285,8 +377,9 @@ const Premium = () => {
                           className="mr-2"
                           color={theme === "dark" ? "#ffffff" : "black"}
                         />{" "}
-                        <div 
-                        className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]">Blue Tick</div>
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
+                          Blue Tick
+                        </div>
                       </li>
                       <li
                         className="flex flex-row m-1"
@@ -299,7 +392,10 @@ const Premium = () => {
                           className="mr-2"
                           color={theme === "dark" ? "#ffffff" : "black"}
                         />{" "}
-                        <div  className="text-[11px] sm:text-[10px] md:text-[11px] lg:text-[14px]"> 6 months</div>
+                        <div className="text-[8px] sm:text-[8px] md:text-[11px] lg:text-[14px]">
+                          {" "}
+                          6 months
+                        </div>
                       </li>
                     </ul>
                   </div>
@@ -309,7 +405,7 @@ const Premium = () => {
                       alignItems: "center",
                     }}
                     onClick={() => handleBuyClick("silver")}
-                      className="btn btn-primary mx-auto flex justify-center items-center w-full sm:w-[60%] md:w-[50%] lg:w-[60%] xl:w-[60%]"
+                    className="btn btn-primary mx-auto flex justify-center items-center w-[80%] sm:w-[60%] md:w-[50%] lg:w-[60%] xl:w-[60%] mb-1"
                   >
                     Buy Gold
                   </button>
@@ -346,6 +442,11 @@ const Premium = () => {
                 </div>
               </div>
             )}
+          </div>
+        )}
+        {loading && (
+          <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
+            <span className="loading loading-spinner loading-xl text-green-500"></span>
           </div>
         )}
       </div>
