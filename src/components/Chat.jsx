@@ -329,9 +329,15 @@ const Chat = ({ onSend }) => {
                 </span>
               </div>
             ) : (
-              <span className="h-3 w-3 rounded-full bg-yellow-400">
-                Offline
-              </span>
+               <div className="flex items-center">
+                <span className="h-3 w-3 rounded-full bg-yellow-400 mr-2"></span>
+                <span
+                  className="text-green-600 font-medium"
+                  style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                >
+                  Offline
+                </span>
+              </div>
             )}
             {status?.lastSeen && !status?.isOnline && (
               <div

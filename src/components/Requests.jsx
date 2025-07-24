@@ -73,8 +73,7 @@ const Requests = () => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -93,25 +92,26 @@ const Requests = () => {
         {},
         { withCredentials: true }
       );
-      console.log(JSON.stringify(res) +" "+res?.data);
+      console.log(
+        JSON.stringify(res) + " " + JSON.stringify(res?.data?.message)
+      );
       if (res?.data?.success) {
-        if (res.data?.message.length >= 0) {
-           console.log("error>>>>!!!!!");
-          dispatch(removeRequests(_id));
-          setDialog({
-            status: true,
-            isOpen: true,
-            title: "Success",
-            message: res?.data?.message,
-            onClose: () => {
-              closeDialog();
-            },
-          });
-        }
-      } 
-      else {
+        // if (res.data?.message.length >0) {
+        console.log("error>>>>!!!!!" + res?.data?.message);
+        dispatch(removeRequests(_id));
+        setDialog({
+          status: true,
+          isOpen: true,
+          title: "Success",
+          message: res?.data?.message,
+          onClose: () => {
+            closeDialog();
+          },
+        });
+        // }
+      } else {
         console.log("error>>>>");
-        
+
         setDialog({
           status: false,
           isOpen: true,
@@ -155,90 +155,94 @@ const Requests = () => {
       }
     }
   };
-  // if (!requests) return;
-
-  if (requests?.length === 0)
-    return (
-      <h1
-        className="flex justify-center my-10"
-        style={{
-          color: theme === "dark" ? "#ffffff" : "black",
-          fontWeight: "500",
-        }}
-      >
-        {" "}
-        No Requests Found
-      </h1>
-    );
 
   return (
     <div className="text-center my-10">
-      <h1
-        className="text-bold text-white text-3xl flex justify-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]"
-        style={{
-          color: theme === "dark" ? "#ffffff" : "black",
-          fontWeight: "bold",
-        }}
-      >
-        Connection Requests
-      </h1>
-
-      {requests?.map((requests) => {
-        const { _id, firstName, lastName, photoUrl, age, gender, about } =
-          requests?.fromUserId;
-
-        return (
-          <div
-            key={_id}
-            className="flex  items-center m-4 p-4 rounded-lg bg-base-300 w-[80%] sm:w-[65%] md:w-[75%] lg:w-[65%] mx-auto"
-            style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
+      {requests.length === 0 ? (
+        <h1
+          className="flex justify-center my-10"
+          style={{
+            color: theme === "dark" ? "#ffffff" : "black",
+            fontWeight: "500",
+          }}
+        >
+          {" "}
+          No Requests Found
+        </h1>
+      ) : (
+        <div>
+          <h1
+            className="text-bold text-white text-3xl flex justify-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]"
+            style={{
+              color: theme === "dark" ? "#ffffff" : "black",
+              fontWeight: "bold",
+            }}
           >
-            <div>
-              <img
-                alt="photo"
-                className="rounded-full w-[110px] h-[60px] sm:w-[25px] sm:h-[80px] md:w-[75px] md:h-[60px] lg:w-[115px] lg:h-[115px]"
-                src={photoUrl}
-              />
-            </div>
-            <div className="text-left mx-6">
+            Connection Requests
+          </h1>
+
+          {requests?.map((request) => {
+            const requestId = request._id;
+            const { _id, firstName, lastName, photoUrl, age, gender, about } =
+              request?.fromUserId;
+
+            return (
               <div
-                className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]"
-                style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                key={_id}
+                className="flex  items-center m-4 p-4 rounded-lg bg-base-300 w-[80%] sm:w-[65%] md:w-[75%] lg:w-[65%] mx-auto"
+                style={{
+                  backgroundColor: theme === "dark" ? "black" : "#DBDBDB",
+                }}
               >
-                {firstName + " " + lastName}
-              </div>
-              {age && gender && (
-                <div
-                  className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]"
-                  style={{ color: theme === "dark" ? "#ffffff" : "black" }}
-                >
-                  {age + ", " + gender}
+                <div>
+                  <img
+                    alt="photo"
+                    className="rounded-full w-[110px] h-[60px] sm:w-[25px] sm:h-[80px] md:w-[75px] md:h-[60px] lg:w-[115px] lg:h-[115px]"
+                    src={photoUrl}
+                  />
                 </div>
-              )}
-              <div
-                className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]"
-                style={{ color: theme === "dark" ? "#ffffff" : "black" }}
-              >
-                {about}
+                <div className="text-left mx-6">
+                  <div
+                    className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]"
+                    style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                  >
+                    {firstName + " " + lastName}
+                  </div>
+                  {age && gender && (
+                    <div
+                      className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]"
+                      style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                    >
+                      {age + ", " + gender}
+                    </div>
+                  )}
+                  <div
+                    className="text-[6px] sm:text-[8px] md:text-[12px] lg:text-[14px]"
+                    style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                  >
+                    {about}
+                  </div>
+                </div>
+                <div className="flex ml-auto">
+                  <button
+                    className="btn btn-primary mx-1 px-2 py-1 text-xs sm:px-2 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base"
+                    onClick={() => reviewRequest("rejected", requestId)}
+                  >
+                    Reject
+                  </button>
+                  <button
+                    className="btn btn-secondary mx-1 px-2 py-1 text-xs sm:px-2 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base"
+                    onClick={() => reviewRequest("accepted", requestId)}
+                  >
+                    Accept
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="flex ml-auto">
-              <button
-                className="btn btn-primary mx-1 px-2 py-1 text-xs sm:px-2 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base"
-                onClick={() => reviewRequest("rejected", _id)}
-              >
-                Reject
-              </button>
-              <button
-                className="btn btn-secondary mx-1 px-2 py-1 text-xs sm:px-2 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base"
-                onClick={() => reviewRequest("accepted",_id)}
-              >
-                Accept
-              </button>
-            </div>
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      )}
+
       {dialog.isOpen && (
         <Dialog
           status={dialog.status}
@@ -248,7 +252,7 @@ const Requests = () => {
           onClose={dialog.onClose}
         />
       )}
-       {loading && (
+      {loading && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
           <span className="loading loading-spinner loading-xl text-green-500"></span>
         </div>

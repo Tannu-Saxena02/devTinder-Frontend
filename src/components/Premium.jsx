@@ -12,12 +12,20 @@ import { TiTick } from "react-icons/ti";
 import { GrValidate } from "react-icons/gr";
 import { VscFeedback } from "react-icons/vsc";
 import { FaUsers } from "react-icons/fa";
+import Dialog from "../utils/Dialog";
 
 const Premium = () => {
   const [isUserPremium, setIsUserPremium] = useState(false);
   const theme = useSelector((state) => state.theme);
   const [premiumText, setPremiumText] = useState("false");
   const [loading, setLoading] = useState(false);
+  const [dialog, setDialog] = useState({
+    status: false,
+    isOpen: false,
+    title: "",
+    message: "",
+    onClose: null,
+  });
   const navigate = useNavigate();
   useEffect(() => {
     let ispremiumText = localStorage.getItem("premiumText");
@@ -118,13 +126,7 @@ const Premium = () => {
           setIsUserPremium(true);
         }
       } else {
-        setDialog({
-          status: false,
-          isOpen: true,
-          title: "Error",
-          message: res?.data?.error,
-          onClose: closeDialog,
-        });
+        console.log("error>>>>"+res?.data?.error);
       }
     } catch (err) {
       console.log("ERROR" + err);
@@ -172,6 +174,9 @@ const Premium = () => {
       window.location.reload(); // Force reload after navigation
     }, 100);
   }
+  const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
+  };
   return (
     <div>
       <div>
@@ -448,6 +453,15 @@ const Premium = () => {
           <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
             <span className="loading loading-spinner loading-xl text-green-500"></span>
           </div>
+        )}
+        {dialog.isOpen && (
+          <Dialog
+            status={dialog.status}
+            isOpen={dialog.isOpen}
+            title={dialog.title}
+            message={dialog.message}
+            onClose={dialog.onClose}
+          />
         )}
       </div>
     </div>

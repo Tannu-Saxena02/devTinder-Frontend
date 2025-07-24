@@ -116,8 +116,10 @@ chat Feature. (done)
  - for config nginx -> sudo nano /etc/nginx/sites-available/default (for config nginx that in # Nginx config)
  - restart nginx -> sudo systemctl restart nginx
  - Modify the BASEURL in frontend project to "/api"
- # for dotenv setup on server
- - sudo nano .env & copy content of .env
+ 
+ # For dotenv setup on server
+ - sudo nano .env 
+ - copy content of .env
  - Press Ctrl + O → Enter (to save) &.  Press Ctrl + X (to exit)
 
 
