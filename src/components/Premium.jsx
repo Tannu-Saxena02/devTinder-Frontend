@@ -126,7 +126,7 @@ const Premium = () => {
           setIsUserPremium(true);
         }
       } else {
-        console.log("error>>>>"+res?.data?.error);
+        console.log("error>>>>" + res?.data?.error);
       }
     } catch (err) {
       console.log("ERROR" + err);
@@ -409,7 +409,7 @@ const Premium = () => {
                       justifyContent: "center",
                       alignItems: "center",
                     }}
-                    onClick={() => handleBuyClick("silver")}
+                    onClick={() => handleBuyClick("gold")}
                     className="btn btn-primary mx-auto flex justify-center items-center w-[80%] sm:w-[60%] md:w-[50%] lg:w-[60%] xl:w-[60%] mb-1"
                   >
                     Buy Gold
@@ -428,12 +428,26 @@ const Premium = () => {
                   />
                 </div>
 
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-10 ">
-                  <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center relative">
-                    <h2 className="text-2xl font-bold text-green-600 mt-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-10">
+                  <div
+                    className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center relative"
+                    style={{
+                      backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
+                    }}
+                  >
+                    <h2
+                      className="text-2xl font-bold mt-4"
+                      style={{ color: "#03bf48" }}
+                    >
                       Payment Successful !
                     </h2>
-                    <p className="text-gray-600 mt-2">
+                    <p
+                      className="m-2 mt-6"
+                      style={{
+                        color: theme === "dark" ? "#ffffff" : "black",
+                        fontSize: 15,
+                      }}
+                    >
                       Thank you for your purchase. Your premium membership is
                       now active.
                     </p>
