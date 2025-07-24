@@ -158,7 +158,7 @@ const Requests = () => {
 
   return (
     <div className="text-center my-10">
-      {requests.length === 0 ? (
+      {requests?.length === 0 ? (
         <h1
           className="flex justify-center my-10"
           style={{

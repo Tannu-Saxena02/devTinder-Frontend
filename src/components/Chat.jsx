@@ -135,8 +135,7 @@ const Chat = ({ onSend }) => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -195,8 +194,7 @@ const Chat = ({ onSend }) => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
+    } finally {
     }
   };
 
@@ -328,26 +326,27 @@ const Chat = ({ onSend }) => {
                   Online
                 </span>
               </div>
-            ) : (
-               <div className="flex items-center">
-                <span className="h-3 w-3 rounded-full bg-yellow-400 mr-2"></span>
-                <span
-                  className="text-green-600 font-medium"
-                  style={{ color: theme === "dark" ? "#ffffff" : "black" }}
-                >
-                  Offline
-                </span>
-              </div>
-            )}
-            {status?.lastSeen && !status?.isOnline && (
+            ) : status?.lastSeen ? (
+              <div className="flex items-center">
+                 <span className="h-3 w-3 rounded-full bg-yellow-400 mr-2"></span>
               <div
-                className="mx-2"
                 style={{
                   fontSize: 12,
                   color: theme === "dark" ? "#ffffff" : "black",
                 }}
               >
                 {getLastSeenText(status?.lastSeen)}
+              </div>
+              </div>
+            ) : (
+              <div className="flex items-center">
+                <span className="h-3 w-3 rounded-full bg-yellow-400 mr-2"></span>
+                <span
+                  className=""
+                  style={{ color: theme === "dark" ? "#ffffff" : "black" }}
+                >
+                  Offline
+                </span>
               </div>
             )}
           </div>
@@ -465,8 +464,9 @@ const Chat = ({ onSend }) => {
               sendMessage(); // call your send function
             }
           }}
-         className={`flex-1 border border-gray-500 ${theme === "dark" ? "text-white" : "text-black"} rounded p-2`}
-
+          className={`flex-1 border border-gray-500 ${
+            theme === "dark" ? "text-white" : "text-black"
+          } rounded p-2`}
         ></input>
         <button
           onClick={() => setShowPicker((prev) => !prev)}
@@ -506,7 +506,7 @@ const Chat = ({ onSend }) => {
           onClose={dialog.onClose}
         />
       )}
-       {loading && (
+      {loading && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
           <span className="loading loading-spinner loading-xl text-green-500"></span>
         </div>

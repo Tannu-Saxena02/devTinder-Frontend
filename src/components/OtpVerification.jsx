@@ -61,11 +61,11 @@ const OtpVerification = () => {
       inputRefs.current[index + 1]?.focus();
     }
   };
-  async function handleResend(){
-   await handleSendOtp();
-   if (!loading) {
-    startTimer();
-   }
+  async function handleResend() {
+    await handleSendOtp();
+    if (!loading) {
+      startTimer();
+    }
   }
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
@@ -92,7 +92,7 @@ const OtpVerification = () => {
           BASE_URL + "/sendOTP",
           {
             email: emailId,
-            purpose:isOtpSignin?"":"forgot"
+            purpose: isOtpSignin ? "" : "forgot",
           },
           { withCredentials: true }
         );
@@ -142,8 +142,7 @@ const OtpVerification = () => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   }
@@ -166,7 +165,7 @@ const OtpVerification = () => {
         );
         if (res.data.success) {
           if (res.data.message.length >= 0)
-            isOtpSignin?navigate("/signup"): navigate("/forgotpassword");
+            isOtpSignin ? navigate("/signup") : navigate("/forgotpassword");
         } else {
           setDialog({
             status: false,
@@ -218,14 +217,22 @@ const OtpVerification = () => {
           onClose: closeDialog,
         });
       }
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center my-10">
+    <div className="flex  flex-col items-center justify-center my-10">
+      <h1
+        className="text-white text-[16px] sm:text-[18px] md:text-[20px] lg:text-[29px] mb-10"
+        style={{
+          color: theme === "dark" ? "#ffffff" : "black",
+          fontWeight: "600",
+        }}
+      >
+        {isOtpSignin ? "Registration" : "Forgot Password"}
+      </h1>
       <div
         className="card bg-base-300  shadow-sm w-76 sm:w-85 md:w-90 lg:w-96 xl:w-[380px]"
         style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
@@ -375,7 +382,7 @@ const OtpVerification = () => {
           onClose={dialog.onClose}
         />
       )}
-       {loading && (
+      {loading && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-10 flex items-center justify-center z-50">
           <span className="loading loading-spinner loading-xl text-green-500"></span>
         </div>
