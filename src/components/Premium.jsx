@@ -17,7 +17,7 @@ import Dialog from "../utils/Dialog";
 const Premium = () => {
   const [isUserPremium, setIsUserPremium] = useState(false);
   const theme = useSelector((state) => state.theme);
-  const [premiumText, setPremiumText] = useState("false");
+  const [premiumText, setPremiumText] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     status: false,
@@ -28,6 +28,7 @@ const Premium = () => {
   });
   const navigate = useNavigate();
   useEffect(() => {
+     setLoading(true);
     let ispremiumText = localStorage.getItem("premiumText");
     setPremiumText(ispremiumText);
     verifyPremiumUser();
@@ -58,6 +59,7 @@ const Premium = () => {
             contact: "9999999999",
           },
           handler: async function (response) {
+             setLoading(true);
             await verifyPremiumUser();
             localStorage.setItem("premiumText", "false");
             setPremiumText("false");
