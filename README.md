@@ -187,3 +187,30 @@ lg:text-[20px] → overrides on screens ≥ 1024px (large devices & up)
 - Ref - https://razorpay.com/docs/webhooks/validate-test/
 - Ref - https://razorpay.com/docs/webhooks/payloads/payments/
 
+
+# Sending Email via SES
+- Create a IAM User
+- Give access to AmazonSESFullAccess
+- Amazon SES- Create an Identity
+- Verify your domain name
+- Verify an Email Address
+- Install AWS SDK - v3
+- Code Example: 
+- Setup SesClient
+- Access Credentials should be created in IAM under security credentials Tab
+- Add the credentials to the env file
+- Write code for SESClient
+- Write code for Sending email address
+- Make the email dynamic by passing more params to the run function
+
+# Scheduling cron jobs in NodeJS
+- Installing node-cron
+- Learning about cron expressions syntax -crontab.guru(website)
+- schedule a job
+- date-fns
+- find all the unique emailId who got connection request in previous day
+- Send Email
+- Explore queue mechanism to send bulk mails (TODO)
+- we can send request to Amazon SES for Bulk Emails request(TODO)
+- Make sendEmail function dynamic (TODO)
+- bee-queue & bull npm packages that used to handle queue mechanism
