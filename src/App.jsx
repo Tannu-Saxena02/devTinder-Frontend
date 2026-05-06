@@ -20,6 +20,7 @@ import Signup from "./components/Signup";
 import ForgotPassword from "./components/ForgotPassword";
 import Requests from "./components/Requests";
 import Premium from "./components/Premium";
+import Posts from "./components/Posts";
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
               <Route path="forgotpassword" element={<ForgotPassword/>} />
               <Route path="resetpassword" element={<ForgotPassword/>} />
               <Route path="premium" element={<Premium />} />
+              <Route path="posts" element={<Posts />} />
             </Route>
           </Routes>
         </BrowserRouter>

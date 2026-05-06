@@ -8,6 +8,7 @@ import termsReducer from "./termsSlice.js";
 import privacyReducer from "./privacySlice.js";
 import forgotReducer from "./forgotSlice.js";
 import otpReducer from "./otpSlice.js";
+import postsReducer from "./postsSlice.js";
 
 const appStore = configureStore({
   reducer: {
@@ -19,8 +20,8 @@ const appStore = configureStore({
     isterms: termsReducer,
     isprivacy: privacyReducer,
     forgot:forgotReducer,
-    otp:otpReducer
-    
+    otp: otpReducer,
+    posts: postsReducer,
   },
 });
 export default appStore;
