@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import Dialog from "../utils/Dialog";
 import { useDispatch, useSelector } from "react-redux";
-import { addPosts } from "../utils/postsSlice.js";
+import { addPosts} from "../utils/postsSlice.js";
 
 const Posts = () => {
   const theme = useSelector((s) => s.theme);
@@ -34,7 +34,7 @@ const Posts = () => {
   const pickerRef = useRef(null);
 
   const [visibility, setVisibility] = useState("anyone");
-  const [openComments, setOpenComments] = useState({});
+  const [likedPosts, setLikedPosts] = useState({});
   const [commentText, setCommentText] = useState({});
   const postData = useSelector((s) => s.posts);
   console.log(JSON.stringify(postData));
@@ -75,13 +75,150 @@ const Posts = () => {
 
       if (res.data.success) {
         if (res.data?.message.length >= 0) {
+          setContent("");
+          setMediaPreview([]);
           setDialog({
             status: true,
             isOpen: true,
             title: "Success",
             message: res.data.message,
+            onClose: () => {
+              setDialog((prev) => ({ ...prev, isOpen: false }));
+              handlegetAllPosts();
+            },
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
             onClose: closeDialog,
           });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReposts = async (postId) => {
+    try {
+      setLoading(true);
+      const res = await axios.post(
+        BASE_URL + "/posts/repost/" + postId,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      console.log("request " + JSON.stringify(res?.data?.data));
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          setContent("");
+          setMediaPreview([]);
+          setDialog({
+            status: true,
+            isOpen: true,
+            title: "Success",
+            message: res.data.message,
+            onClose: () => {
+              setDialog((prev) => ({ ...prev, isOpen: false }));
+              handlegetAllPosts();
+            },
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUserPosts = async (userId) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(BASE_URL + "/user/posts/" + userId, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          dispatch(addPosts(res.data?.data || []));
         }
       } else {
         setDialog({
@@ -190,17 +327,23 @@ const Posts = () => {
     }
   };
 
-  const handleLike = (id) => {
-    setPosts((prev) =>
-      prev.map((p) => {
-        if (p.id !== id) return p;
-        const liked = p.likes.includes("me");
-        return {
-          ...p,
-          likes: liked ? p.likes.filter((l) => l !== "me") : [...p.likes, "me"],
-        };
-      }),
-    );
+  const handleLike = async (postId) => {
+    try {
+      await axios.post(
+        BASE_URL + "/posts/like",
+        { postId },
+        { withCredentials: true },
+      );
+      handlegetAllPosts();
+    } catch (err) {
+      setDialog({
+        status: false,
+        isOpen: true,
+        title: "Error",
+        message: err?.message || "Unexpected error",
+        onClose: closeDialog,
+      });
+    }
   };
 
   const handleComment = (id) => {
@@ -217,24 +360,6 @@ const Posts = () => {
       ),
     );
     setCommentText((p) => ({ ...p, [id]: "" }));
-  };
-
-  const handleRepost = (post) => {
-    setPosts((p) => [
-      {
-        id: Date.now(),
-        author: {
-          name: user?.firstName + " " + user?.lastName,
-          photo: user?.photoUrl,
-        },
-        content: post.content,
-        originalAuthor: post.author.name,
-        likes: [],
-        comments: [],
-        createdAt: new Date().toLocaleDateString(),
-      },
-      ...p,
-    ]);
   };
 
   return (
@@ -440,7 +565,10 @@ const Posts = () => {
               </div>
             </div>
 
-            <p className="text-sm mb-4" style={{ color: textColor }}>
+            <p
+              className="text-sm mb-4 whitespace-pre-wrap"
+              style={{ color: textColor }}
+            >
               {post?.postContent}
             </p>
             {post?.media?.length > 0 && (
@@ -467,7 +595,7 @@ const Posts = () => {
                 className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
                 onClick={() => handleLike(post._id)}
               >
-                {post.likes > 0 ? (
+                {post?.likes > 0 ? (
                   <AiFillLike size={18} color="#feba00" />
                 ) : (
                   <AiOutlineLike size={18} />
@@ -485,7 +613,7 @@ const Posts = () => {
               </button>
               <button
                 className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
-                onClick={() => handleRepost(post)}
+                onClick={() => handleReposts(post._id)}
               >
                 <FaRetweet size={18} />
               </button>
