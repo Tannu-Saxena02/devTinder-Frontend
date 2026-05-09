@@ -32,14 +32,29 @@ const Posts = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [mediaPreview, setMediaPreview] = useState([]);
   const pickerRef = useRef(null);
+  const textareaRef = useRef(null);
+  const cursorPos = useRef(0);
 
   const [visibility, setVisibility] = useState("anyone");
-  const [likedPosts, setLikedPosts] = useState({});
   const [commentText, setCommentText] = useState({});
   const postData = useSelector((s) => s.posts);
-  console.log(JSON.stringify(postData));
   useEffect(() => {
     handlegetAllPosts();
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (
+        pickerRef.current &&
+        !pickerRef.current.contains(e.target) &&
+        !textareaRef.current?.contains(e.target)
+      ) {
+        setShowPicker(false);
+      }
+    };
+// It listens for any mousedown event on the entire page.
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);// cler this event
   }, []);
   const timeAgo = (date) => {
     const diff = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -57,7 +72,10 @@ const Posts = () => {
     setMediaPreview((prev) => [...prev, ...urls]);
   };
   const handleEmojiClick = (emojiData) => {
-    setContent((prev) => prev + emojiData.emoji);
+    const pos = cursorPos.current;
+    const emoji = emojiData.emoji;
+    setContent((prev) => prev.slice(0, pos) + emoji + prev.slice(pos));
+    cursorPos.current = pos + emoji.length;
   };
 
   const handlePosts = async () => {
@@ -270,7 +288,7 @@ const Posts = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        BASE_URL + "/user/posts/688477e3f6af29bebdb34213",
+        BASE_URL + "/user/allposts",
         {
           withCredentials: true,
         },
@@ -405,8 +423,10 @@ const Posts = () => {
               minHeight: 80,
             }}
             placeholder="Share something with the dev community..."
+            ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            onBlur={(e) => { cursorPos.current = e.target.selectionStart; }}
             maxLength={500}
           />
         </div>
@@ -453,7 +473,7 @@ const Posts = () => {
           >
             {content.length}/500
           </span>
-          <div className="flex items-center gap-2 relative">
+          <div className="flex items-center gap-2 relative" ref={pickerRef}>
             <label style={{ cursor: "pointer", fontSize: 18 }}>
               📎
               <input
