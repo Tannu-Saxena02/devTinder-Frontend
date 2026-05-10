@@ -7,7 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import Dialog from "../utils/Dialog";
 import { useDispatch, useSelector } from "react-redux";
-import { addPosts} from "../utils/postsSlice.js";
+import { addPosts } from "../utils/postsSlice.js";
+import { BsThreeDots } from "react-icons/bs";
+import ConfirmDialog from "../utils/ConfirmDialog";
 
 const Posts = () => {
   const theme = useSelector((s) => s.theme);
@@ -20,6 +22,12 @@ const Posts = () => {
     message: "",
     onClose: null,
   });
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -31,12 +39,21 @@ const Posts = () => {
   const [content, setContent] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const [mediaPreview, setMediaPreview] = useState([]);
+  const [showMenu, setShowMenu] = useState(null);
+
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [editMedia, setEditMedia] = useState([]);
+  const [editVisibility, setEditVisibility] = useState("anyone");
+  const [activeButtonIndex,setActiveButtonIndex] = useState(-1);        
+
   const pickerRef = useRef(null);
   const textareaRef = useRef(null);
   const cursorPos = useRef(0);
 
   const [visibility, setVisibility] = useState("anyone");
   const [commentText, setCommentText] = useState({});
+  const [openComments, setOpenComments] = useState({});
   const postData = useSelector((s) => s.posts);
   useEffect(() => {
     handlegetAllPosts();
@@ -52,9 +69,9 @@ const Posts = () => {
         setShowPicker(false);
       }
     };
-// It listens for any mousedown event on the entire page.
+    // It listens for any mousedown event on the entire page.
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);// cler this event
+    return () => document.removeEventListener("mousedown", handler); // cler this event
   }, []);
   const timeAgo = (date) => {
     const diff = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -66,10 +83,18 @@ const Posts = () => {
   const closeDialog = () => {
     setDialog((prev) => ({ ...prev, isOpen: false }));
   };
+  const closeConfirmDialog = () => {
+    setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+  };
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     const urls = files.map((f) => URL.createObjectURL(f));
     setMediaPreview((prev) => [...prev, ...urls]);
+  };
+  const handleEditFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    const urls = files.map((f) => URL.createObjectURL(f));
+    setEditMedia((prev) => [...prev, ...urls]);
   };
   const handleEmojiClick = (emojiData) => {
     const pos = cursorPos.current;
@@ -287,12 +312,9 @@ const Posts = () => {
   const handlegetAllPosts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        BASE_URL + "/user/allposts",
-        {
-          withCredentials: true,
-        },
-      );
+      const res = await axios.get(BASE_URL + "/user/allposts", {
+        withCredentials: true,
+      });
 
       if (res.data.success) {
         if (res.data?.message.length >= 0) {
@@ -345,6 +367,173 @@ const Posts = () => {
     }
   };
 
+  const startEditingPost = (post) => {
+    setShowMenu(null);
+    setEditingPostId(post._id);
+    setEditContent(post?.postContent || "");
+    setEditMedia(post?.media || []);
+    setEditVisibility(post?.visibility === "anyone" ? "public" : "private");
+  };
+
+  const cancelEditingPost = () => {
+    setEditingPostId(null);
+    setEditContent("");
+    setEditMedia([]);
+    setEditVisibility("anyone");
+  };
+
+  const handleEditPost = async (postId) => {
+    try {
+      setLoading(true);
+      const req = {
+        postContent: editContent,
+        media: editMedia,
+        visibility: editVisibility === "anyone" ? "public" : "private",
+      };
+      const res = await axios.post(BASE_URL + "/posts/edit/" + postId, req, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          cancelEditingPost();
+          setDialog({
+            status: true,
+            isOpen: true,
+            title: "Success",
+            message: res.data.message,
+            onClose: () => {
+              setDialog((prev) => ({ ...prev, isOpen: false }));
+              handlegetAllPosts();
+            },
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    closeConfirmDialog();
+
+    try {
+      setLoading(true);
+      const res = await axios.delete(BASE_URL + "/posts/delete/" + postId, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          setDialog({
+            status: true,
+            isOpen: true,
+            title: "Success",
+            message: res.data.message,
+            onClose: () => {
+              setDialog((prev) => ({ ...prev, isOpen: false }));
+              handlegetAllPosts();
+            },
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openDeleteConfirmDialog = (postId) => {
+    setShowMenu(null);
+    setConfirmDialog({
+      isOpen: true,
+      title: "Delete Post",
+      message: "Are you sure you want to delete this post?",
+      onConfirm: () => handleDeletePost(postId),
+    });
+  };
+
   const handleLike = async (postId) => {
     try {
       await axios.post(
@@ -363,7 +552,6 @@ const Posts = () => {
       });
     }
   };
-
   const handleComment = (id) => {
     const text = commentText[id]?.trim();
     if (!text) return;
@@ -378,6 +566,18 @@ const Posts = () => {
       ),
     );
     setCommentText((p) => ({ ...p, [id]: "" }));
+  };
+
+  const handlePostButtonClick = () => {
+    setActiveButtonIndex(0);
+  };
+
+  const handleCommentsButtonClick = () => {
+    setActiveButtonIndex(1);
+  };
+
+  const handleReactionsButtonClick = () => {
+    setActiveButtonIndex(2);
   };
 
   return (
@@ -426,7 +626,9 @@ const Posts = () => {
             ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            onBlur={(e) => { cursorPos.current = e.target.selectionStart; }}
+            onBlur={(e) => {
+              cursorPos.current = e.target.selectionStart;
+            }}
             maxLength={500}
           />
         </div>
@@ -525,7 +727,52 @@ const Posts = () => {
           </div>
         </div>
       </div>
-
+      {/* //here */}
+      <div className="flex gap-2 mt-2">
+        <button
+          type="button"       
+          className="btn btn-sm"
+          style={{
+            backgroundColor: activeButtonIndex === 0 ? "#f0c000" : inputBg,
+            color: "#000",
+            border: "none",
+            fontWeight: 600,
+             borderRadius: 10,
+          }}
+          onClick={() => handlePostButtonClick()}
+        >
+          Post
+        </button>
+        <button
+          type="button"
+          className="btn btn-sm"
+          style={{
+            backgroundColor: activeButtonIndex === 1 ? "#f0c000" : inputBg,
+            color: textColor,
+            border:
+              theme === "dark" ? "1px solid #2e2e2e" : "1px solid #e0e0e0",
+              borderRadius: 10,
+          }}
+          onClick={() => handleCommentsButtonClick()}
+          
+        >
+          Comments
+        </button>
+        <button
+          type="button"
+          className="btn btn-sm"
+          style={{
+            backgroundColor: activeButtonIndex === 2 ? "#f0c000" : inputBg,
+            color: textColor,
+            border:
+              theme === "dark" ? "1px solid #2e2e2e" : "1px solid #e0e0e0",
+            borderRadius: 10,
+          }}
+          onClick={() => handleReactionsButtonClick()}
+        >
+          Reactions
+        </button>
+      </div>
       {/* Empty state */}
       {postData?.length === 0 && (
         <p
@@ -584,29 +831,219 @@ const Posts = () => {
                 </p>
               </div>
             </div>
-
-            <p
-              className="text-sm mb-4 whitespace-pre-wrap"
-              style={{ color: textColor }}
+            <div
+              style={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
             >
-              {post?.postContent}
-            </p>
-            {post?.media?.length > 0 && (
-              <div className="flex flex-row gap-2 mb-4">
-                {post?.media.map((url, i) => (
-                  <img
-                    key={i}
-                    src={
-                      "https://images.pexels.com/photos/36305686/pexels-photo-36305686.jpeg"
-                    }
-                    alt="attachment"
-                    className="rounded-lg max-h-64 object-contain w-full"
-                  />
-                ))}
+              {/* Three dots icon */}
+              {editingPostId !== post._id && (
+                <BsThreeDots
+                  style={{
+                    cursor: "pointer",
+                    fontSize: 20,
+                    color: theme === "dark" ? "#fff" : "#000",
+                  }}
+                  onClick={() =>
+                    setShowMenu((current) =>
+                      current === post._id ? null : post._id,
+                    )
+                  }
+                />
+              )}
+
+              {/* Dropdown menu */}
+              {showMenu === post._id && (
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: 28,
+                    backgroundColor: theme === "dark" ? "#1e1e1e" : "#fff",
+                    border:
+                      theme === "dark" ? "1px solid #333" : "1px solid #ddd",
+                    borderRadius: 10,
+                    padding: 6,
+                    width: 120,
+                    boxShadow:
+                      theme === "dark"
+                        ? "0px 4px 12px rgba(0,0,0,0.5)"
+                        : "0px 4px 12px rgba(0,0,0,0.15)",
+                    zIndex: 100,
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "10px 12px",
+                      cursor: "pointer",
+                      borderRadius: 6,
+                      color: theme === "dark" ? "#fff" : "#000",
+                      transition: "0.2s",
+                    }}
+                    onClick={() => startEditingPost(post)}
+                  >
+                    Edit
+                  </div>
+
+                  <div
+                    style={{
+                      padding: "10px 12px",
+                      cursor: "pointer",
+                      borderRadius: 6,
+                      color: "#ff4d4f",
+                      transition: "0.2s",
+                    }}
+                    onClick={() => openDeleteConfirmDialog(post._id)}
+                  >
+                    Delete
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* edit container */}
+            {editingPostId === post._id ? (
+              <div className="mb-4">
+                <select
+                  value={editVisibility}
+                  onChange={(e) => setEditVisibility(e.target.value)}
+                  className="text-xs rounded-md px-2 py-1 mb-2 outline-none"
+                  style={{
+                    backgroundColor: inputBg,
+                    color: textColor,
+                    border:
+                      theme === "dark"
+                        ? "1px solid #2e2e2e"
+                        : "1px solid #e0e0e0",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="anyone">Anyone</option>
+                  <option value="me">Only me</option>
+                </select>
+                <textarea
+                  className="w-full resize-none rounded-lg p-3 text-sm outline-none"
+                  style={{
+                    backgroundColor: inputBg,
+                    color: textColor,
+                    border:
+                      theme === "dark"
+                        ? "1px solid #2e2e2e"
+                        : "1px solid #e0e0e0",
+                    minHeight: 100,
+                  }}
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  maxLength={500}
+                  autoFocus
+                />
+                {editMedia.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {editMedia.map((url, i) => (
+                      <div key={url + i} className="relative inline-block">
+                        <img
+                          src={url}
+                          alt="attachment"
+                          className="rounded-lg max-h-40 object-cover"
+                        />
+                        <button
+                          onClick={() =>
+                            setEditMedia((prev) =>
+                              prev.filter((_, idx) => idx !== i),
+                            )
+                          }
+                          style={{
+                            position: "absolute",
+                            top: -6,
+                            right: -6,
+                            background: "#ff4444",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: 18,
+                            height: 18,
+                            cursor: "pointer",
+                            fontSize: 11,
+                          }}
+                        >
+                          x
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex justify-between items-center mt-3">
+                  <span
+                    className="text-xs"
+                    style={{ color: theme === "dark" ? "#666" : "#aaa" }}
+                  >
+                    {editContent.length}/500
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <label style={{ cursor: "pointer", fontSize: 13 }}>
+                      Attach
+                      <input
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={handleEditFileChange}
+                        accept="image/*,video/*"
+                        multiple
+                      />
+                    </label>
+                    <button
+                      className="btn btn-sm"
+                      style={{
+                        backgroundColor:
+                          theme === "dark" ? "#2a2a2a" : "#e5e7eb",
+                        color: textColor,
+                        border: "none",
+                      }}
+                      onClick={cancelEditingPost}
+                      disabled={loading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn btn-sm px-5"
+                      style={{
+                        backgroundColor: "#feba00",
+                        color: "#000",
+                        fontWeight: 600,
+                        border: "none",
+                      }}
+                      onClick={() => handleEditPost(post._id)}
+                      disabled={!editContent.trim() || loading}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
               </div>
+            ) : (
+              <>
+                <p
+                  className="text-sm mb-4 whitespace-pre-wrap"
+                  style={{ color: textColor }}
+                >
+                  {post?.postContent}
+                </p>
+                {post?.media?.length > 0 && (
+                  <div className="flex flex-row gap-2 mb-4">
+                    {post?.media.map((url, i) => (
+                      <img
+                        key={i}
+                        src={url} // "https://images.pexels.com/photos/36305686/pexels-photo-36305686.jpeg"
+                        alt="attachment"
+                        className="rounded-lg max-h-64 object-contain w-full"
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Actions */}
+            {/* Actions -like comments reposts*/}
             <div
               className="flex gap-6 text-sm"
               style={{ color: theme === "dark" ? "#888" : "#666" }}
@@ -711,6 +1148,16 @@ const Posts = () => {
           title={dialog.title}
           message={dialog.message}
           onClose={dialog.onClose}
+        />
+      )}
+      {confirmDialog.isOpen && (
+        <ConfirmDialog
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          onCancel={closeConfirmDialog}
+          onConfirm={confirmDialog.onConfirm}
+          confirmText="Confirm"
+          cancelText="Cancel"
         />
       )}
     </div>
