@@ -882,7 +882,7 @@ const Posts = () => {
               }}
             >
               {/* Three dots icon */}
-              {editingPostId !== post._id && (
+              {editingPostId !== post._id && post.isEditable && post.isDeletable && (
                 <BsThreeDots
                   style={{
                     cursor: "pointer",
