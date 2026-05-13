@@ -7,9 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import Dialog from "../utils/Dialog";
 import { useDispatch, useSelector } from "react-redux";
-import { addPosts } from "../utils/postsSlice.js";
+import { addPosts, appendPosts } from "../utils/postsSlice.js";
 import { BsThreeDots } from "react-icons/bs";
 import ConfirmDialog from "../utils/ConfirmDialog";
+
+const POST_LIMIT = 10;
 
 const Posts = () => {
   const theme = useSelector((s) => s.theme);
@@ -40,6 +42,10 @@ const Posts = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [mediaPreview, setMediaPreview] = useState([]);
   const [showMenu, setShowMenu] = useState(null);
+  const [postPage, setPostPage] = useState(1);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [isAllPostsFeed, setIsAllPostsFeed] = useState(true);
 
   const [editingPostId, setEditingPostId] = useState(null);
   const [editContent, setEditContent] = useState("");
@@ -56,8 +62,23 @@ const Posts = () => {
   const [openComments, setOpenComments] = useState({});
   const postData = useSelector((s) => s.posts);
   useEffect(() => {
-    handlegetAllPosts();
+    handlegetAllPosts(1, true);
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isNearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 250;
+
+      if (isAllPostsFeed && isNearBottom && hasMorePosts && !postsLoading) {
+        handlegetAllPosts(postPage + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isAllPostsFeed, hasMorePosts, postPage, postsLoading]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -127,7 +148,7 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts();
+              handlegetAllPosts(1, true);
             },
           });
         }
@@ -201,7 +222,7 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts();
+              handlegetAllPosts(1, true);
             },
           });
         }
@@ -309,17 +330,33 @@ const Posts = () => {
       setLoading(false);
     }
   };
-  const handlegetAllPosts = async () => {
+  const handlegetAllPosts = async (page = 1, resetPosts = false) => {
     try {
-      setLoading(true);
+      if (postsLoading) return;
+
+      setPostsLoading(true);
+
       const res = await axios.get(BASE_URL + "/user/allposts", {
+        params: {
+          page,
+          limit: POST_LIMIT,
+        },
         withCredentials: true,
       });
 
       if (res.data.success) {
-        if (res.data?.message.length >= 0) {
-          dispatch(addPosts(res.data?.data || []));
+        const postsResult = res.data?.data || [];
+
+
+        if (resetPosts || page === 1) {
+          dispatch(addPosts(postsResult));
+        } else {
+          dispatch(appendPosts(postsResult));
         }
+
+       const hasNextPage = postsResult.length === POST_LIMIT;
+        setPostPage(page);
+        setHasMorePosts(hasNextPage);
       } else {
         setDialog({
           status: false,
@@ -363,7 +400,7 @@ const Posts = () => {
         });
       }
     } finally {
-      setLoading(false);
+      setPostsLoading(false);
     }
   };
 
@@ -390,7 +427,7 @@ const Posts = () => {
         media: editMedia,
         visibility: editVisibility === "anyone" ? "public" : "private",
       };
-      const res = await axios.post(BASE_URL + "/posts/edit/" + postId, req, {
+      const res = await axios.put(BASE_URL + "/posts/edit/" + postId, req, {
         withCredentials: true,
       });
 
@@ -404,7 +441,7 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts();
+              handlegetAllPosts(1, true);
             },
           });
         }
@@ -473,7 +510,7 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts();
+              handlegetAllPosts(1, true);
             },
           });
         }
@@ -541,7 +578,7 @@ const Posts = () => {
         { postId },
         { withCredentials: true },
       );
-      handlegetAllPosts();
+      handlegetAllPosts(1, true);
     } catch (err) {
       setDialog({
         status: false,
@@ -568,12 +605,18 @@ const Posts = () => {
     setCommentText((p) => ({ ...p, [id]: "" }));
   };
 
-  const handlePostButtonClick = () => {
+  const handleExploreFeed= () => {
     setActiveButtonIndex(0);
+    setIsAllPostsFeed(true);
+    setHasMorePosts(true);
+    handlegetAllPosts(1, true);
   };
 
-  const handleCommentsButtonClick = () => {
+  const handleAllUsersPosts = () => {
     setActiveButtonIndex(1);
+    setIsAllPostsFeed(false);
+    setHasMorePosts(false);
+    handleUserPosts(user._id);
   };
 
   const handleReactionsButtonClick = () => {
@@ -728,20 +771,20 @@ const Posts = () => {
         </div>
       </div>
       {/* //here */}
-      <div className="flex gap-2 mt-2">
+      <div className="flex gap-2 mt-2 mb-4">
         <button
           type="button"       
           className="btn btn-sm"
           style={{
             backgroundColor: activeButtonIndex === 0 ? "#f0c000" : inputBg,
-            color: "#000",
+            color: textColor,
             border: "none",
             fontWeight: 600,
              borderRadius: 10,
           }}
-          onClick={() => handlePostButtonClick()}
+          onClick={() => handleExploreFeed()}
         >
-          Post
+          Explore Feed
         </button>
         <button
           type="button"
@@ -753,10 +796,10 @@ const Posts = () => {
               theme === "dark" ? "1px solid #2e2e2e" : "1px solid #e0e0e0",
               borderRadius: 10,
           }}
-          onClick={() => handleCommentsButtonClick()}
+          onClick={() => handleAllUsersPosts()}
           
         >
-          Comments
+          My Posts
         </button>
         <button
           type="button"
@@ -1141,6 +1184,14 @@ const Posts = () => {
           </div>
         );
       })}
+      {postsLoading && (
+        <div className="flex justify-center py-5">
+          <span
+            className="loading loading-spinner loading-md"
+            style={{ color: "#feba00" }}
+          ></span>
+        </div>
+      )}
       {dialog.isOpen && (
         <Dialog
           status={dialog.status}
