@@ -51,15 +51,19 @@ const Posts = () => {
   const [editContent, setEditContent] = useState("");
   const [editMedia, setEditMedia] = useState([]);
   const [editVisibility, setEditVisibility] = useState("anyone");
-  const [activeButtonIndex,setActiveButtonIndex] = useState(-1);        
+  const [activeButtonIndex, setActiveButtonIndex] = useState(-1);
 
   const pickerRef = useRef(null);
   const textareaRef = useRef(null);
   const cursorPos = useRef(0);
 
   const [visibility, setVisibility] = useState("anyone");
-  const [commentText, setCommentText] = useState({});
+  const [commentText, setCommentText] = useState({}); // value for input
   const [openComments, setOpenComments] = useState({});
+  const [parentCommentId, setParentCommentId] = useState(null);
+  const [postComments, setPostComments] = useState({});
+  const [toggleReplies, setToggleReplies] = useState({}); // for toggling replies
+  const [replyComments, setReplyComments] = useState({}); // store response as replies
   const postData = useSelector((s) => s.posts);
   useEffect(() => {
     handlegetAllPosts(1, true);
@@ -198,7 +202,207 @@ const Posts = () => {
       setLoading(false);
     }
   };
+  const handleCreateComments = async (postId) => {
+    const text = commentText[postId]?.trim(); //extract value from input value
+    if (!text) return;
 
+    try {
+      setLoading(true);
+      const req = {
+        content: text,
+        parentCommentId,
+      };
+      const res = await axios.post(BASE_URL + "/createComment/" + postId, req, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          setCommentText((prev) => ({ ...prev, [postId]: "" }));
+          setParentCommentId(null);
+          setDialog({
+            status: true,
+            isOpen: true,
+            title: "Success",
+            message: res.data.message,
+            onClose: () => {
+              setDialog((prev) => ({ ...prev, isOpen: false }));
+              handleGetAllTopLevelComments(postId);
+            },
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetAllTopLevelComments = async (postId) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(BASE_URL + "/post/" + postId, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          const comments = res.data?.data ?? [];
+          setPostComments((prev) => ({
+            ...prev,
+            [postId]: comments,
+          }));
+          setReplyComments((prev) => ({
+            ...prev,
+            [postId]: res.data?.data?.replies,
+          }));
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleGetNestedComments = async (commentId) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(BASE_URL + "/nestedreplies/" + commentId, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          setReplyComments((prev) => ({
+            ...prev,
+            [commentId]: res.data.data.replies,
+          }));
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleReposts = async (postId) => {
     try {
       setLoading(true);
@@ -347,14 +551,13 @@ const Posts = () => {
       if (res.data.success) {
         const postsResult = res.data?.data || [];
 
-
         if (resetPosts || page === 1) {
           dispatch(addPosts(postsResult));
         } else {
           dispatch(appendPosts(postsResult));
         }
 
-       const hasNextPage = postsResult.length === POST_LIMIT;
+        const hasNextPage = postsResult.length === POST_LIMIT;
         setPostPage(page);
         setHasMorePosts(hasNextPage);
       } else {
@@ -589,23 +792,8 @@ const Posts = () => {
       });
     }
   };
-  const handleComment = (id) => {
-    const text = commentText[id]?.trim();
-    if (!text) return;
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id !== id
-          ? p
-          : {
-              ...p,
-              comments: [...p.comments, { author: user?.firstName, text }],
-            },
-      ),
-    );
-    setCommentText((p) => ({ ...p, [id]: "" }));
-  };
 
-  const handleExploreFeed= () => {
+  const handleExploreFeed = () => {
     setActiveButtonIndex(0);
     setIsAllPostsFeed(true);
     setHasMorePosts(true);
@@ -622,7 +810,113 @@ const Posts = () => {
   const handleReactionsButtonClick = () => {
     setActiveButtonIndex(2);
   };
+  const handleReply = (commentId, firstName, postId) => {
+    setCommentText((prev) => ({
+      ...prev,
+      [postId]: `@${firstName} `,
+    }));
 
+    setParentCommentId(commentId);
+  };
+
+  const CommentItem = ({
+    comment,
+    level = 0,
+    inputBg,
+    textColor,
+    toggleReplies,
+    setToggleReplies,
+    replyComments,
+    setReplyComments,
+    handleGetNestedComments,
+    handleReply,
+  }) => {
+    return (
+      <div
+        className="flex flex-col gap-2 mb-3"
+        style={{
+          marginLeft: `${level * 25}px`,
+        }}
+      >
+        {/* Comment Row */}
+        <div className="flex gap-2 items-start">
+          <img
+            src={comment.userId?.photoUrl}
+            alt="avatar"
+            className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+          />
+
+          <div
+            className="rounded-lg px-3 py-2 text-xs"
+            style={{
+              backgroundColor: inputBg,
+              color: textColor,
+            }}
+          >
+            <span className="font-semibold">
+              {comment.userId?.firstName} {comment.userId?.lastName}:{" "}
+            </span>
+
+            {comment.content}
+          </div>
+
+          {/* Reply */}
+          <div
+            className="text-xs text-blue-500 hover:underline cursor-pointer"
+            onClick={() =>
+              handleReply(
+                comment._id,
+                comment.userId?.firstName,
+                comment.postId,
+              )
+            }
+          >
+            reply
+          </div>
+
+          {/* Toggle Replies */}
+          {(comment?.replies?.length ?? 0) > 0 && (
+            <div
+              className="text-xs text-blue-500 hover:underline cursor-pointer"
+              onClick={() => {
+                // setReplyComments((prev) => ({
+                //   ...prev,
+                //   [comment._id]: comment.replies ?? [],
+                // }));
+
+                setToggleReplies((prev) => ({
+                  ...prev,
+                  [comment._id]: !prev[comment._id],
+                }));
+
+                handleGetNestedComments(comment._id);
+              }}
+            >
+              {toggleReplies[comment._id] ? "collapse replies" : "see replies"}
+            </div>
+          )}
+        </div>
+
+        {/* Recursive Replies */}
+        {toggleReplies[comment._id] &&
+          (replyComments[comment._id] || []).map((reply) => (
+            <CommentItem
+              key={reply._id}
+              comment={reply}
+              level={level + 1}
+              inputBg={inputBg}
+              textColor={textColor}
+              toggleReplies={toggleReplies}
+              setToggleReplies={setToggleReplies}
+              replyComments={replyComments}
+              setReplyComments={setReplyComments}
+              handleGetNestedComments={handleGetNestedComments}
+              handleReply={handleReply}
+            />
+          ))}
+      </div>
+    );
+  };
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Write Post */}
@@ -773,14 +1067,14 @@ const Posts = () => {
       {/* //here */}
       <div className="flex gap-2 mt-2 mb-4">
         <button
-          type="button"       
+          type="button"
           className="btn btn-sm"
           style={{
             backgroundColor: activeButtonIndex === 0 ? "#f0c000" : inputBg,
             color: textColor,
             border: "none",
             fontWeight: 600,
-             borderRadius: 10,
+            borderRadius: 10,
           }}
           onClick={() => handleExploreFeed()}
         >
@@ -794,10 +1088,9 @@ const Posts = () => {
             color: textColor,
             border:
               theme === "dark" ? "1px solid #2e2e2e" : "1px solid #e0e0e0",
-              borderRadius: 10,
+            borderRadius: 10,
           }}
           onClick={() => handleAllUsersPosts()}
-          
         >
           My Posts
         </button>
@@ -882,20 +1175,22 @@ const Posts = () => {
               }}
             >
               {/* Three dots icon */}
-              {editingPostId !== post._id && post.isEditable && post.isDeletable && (
-                <BsThreeDots
-                  style={{
-                    cursor: "pointer",
-                    fontSize: 20,
-                    color: theme === "dark" ? "#fff" : "#000",
-                  }}
-                  onClick={() =>
-                    setShowMenu((current) =>
-                      current === post._id ? null : post._id,
-                    )
-                  }
-                />
-              )}
+              {editingPostId !== post._id &&
+                post.isEditable &&
+                post.isDeletable && (
+                  <BsThreeDots
+                    style={{
+                      cursor: "pointer",
+                      fontSize: 20,
+                      color: theme === "dark" ? "#fff" : "#000",
+                    }}
+                    onClick={() =>
+                      setShowMenu((current) =>
+                        current === post._id ? null : post._id,
+                      )
+                    }
+                  />
+                )}
 
               {/* Dropdown menu */}
               {showMenu === post._id && (
@@ -1105,7 +1400,27 @@ const Posts = () => {
               <button
                 className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
                 onClick={() =>
-                  setOpenComments((p) => ({ ...p, [post._id]: !p[post._id] }))
+                  // setOpenComments((p) => {
+                  //   const isOpening = !p[post._id];
+                  //   if (isOpening) {
+                  //     handleGetAllTopLevelComments(post._id);
+                  //   }
+                  //   return { ...p, [post._id]: isOpening };
+                  // })
+                  {
+                    const isOpen = !openComments[post._id];
+
+                    // update state
+                    setOpenComments({
+                      ...openComments,
+                      [post._id]: isOpen,
+                    });
+
+                    // fetch comments when opening
+                    if (isOpen) {
+                      handleGetAllTopLevelComments(post._id);
+                    }
+                  }
                 }
               >
                 <FaRegComment size={16} />
@@ -1118,52 +1433,46 @@ const Posts = () => {
                 <FaRetweet size={18} />
               </button>
             </div>
-
-            {/* Comments */}
-            {/* {openComments[post.id] && (
-              <div
-                className="mt-3 pt-3"
-                style={{
-                  borderTop: theme === "dark" ? "1px solid #2e2e2e" : "1px solid #e0e0e0",
-                }}
-              >
-                {post.comments.map((c, i) => (
-                  <div key={i} className="flex gap-2 mb-2 items-start">
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                      style={{ backgroundColor: "#feba00", color: "#000" }}
-                    >
-                      {c.author?.[0]}
-                    </div>
-                    <div
-                      className="rounded-lg px-3 py-2 text-xs flex-1"
-                      style={{ backgroundColor: inputBg, color: textColor }}
-                    >
-                      <span className="font-semibold">{c.author}: </span>
-                      {c.text}
-                    </div>
-                  </div>
+            {openComments[post._id] && (
+              <>
+                {(postComments[post._id] || []).map((comment) => (
+                  <CommentItem
+                    key={comment._id}
+                    comment={comment}
+                    level={0}
+                    inputBg={inputBg}
+                    textColor={textColor}
+                    toggleReplies={toggleReplies}
+                    setToggleReplies={setToggleReplies}
+                    replyComments={replyComments}
+                    setReplyComments={setReplyComments}
+                    handleGetNestedComments={handleGetNestedComments}
+                    handleReply={handleReply}
+                  />
                 ))}
+
+                {/* Comments */}
                 <div className="flex gap-2 mt-2">
                   <input
                     className="flex-1 rounded-lg px-3 py-2 text-xs outline-none"
                     style={{
                       backgroundColor: inputBg,
                       color: textColor,
-                      border: theme === "dark"
-                        ? "1px solid #2e2e2e"
-                        : "1px solid #e0e0e0",
+                      border:
+                        theme === "dark"
+                          ? "1px solid #2e2e2e"
+                          : "1px solid #e0e0e0",
                     }}
                     placeholder="Write a comment..."
-                    value={commentText[post.id] || ""}
+                    value={commentText[post._id] || ""}
                     onChange={(e) =>
                       setCommentText((p) => ({
                         ...p,
-                        [post.id]: e.target.value,
+                        [post._id]: e.target.value,
                       }))
                     }
                     onKeyDown={(e) =>
-                      e.key === "Enter" && handleComment(post.id)
+                      e.key === "Enter" && handleCreateComments(post._id)
                     }
                   />
                   <button
@@ -1174,13 +1483,13 @@ const Posts = () => {
                       border: "none",
                       fontWeight: 600,
                     }}
-                    onClick={() => handleComment(post.id)}
+                    onClick={() => handleCreateComments(post._id)}
                   >
                     Send
                   </button>
                 </div>
-              </div>
-            )} */}
+              </>
+            )}
           </div>
         );
       })}
