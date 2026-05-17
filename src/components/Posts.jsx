@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addPosts, appendPosts } from "../utils/postsSlice.js";
 import { BsThreeDots } from "react-icons/bs";
 import ConfirmDialog from "../utils/ConfirmDialog";
+import { MdClose } from "react-icons/md";
 
 const POST_LIMIT = 10;
 
@@ -64,6 +65,12 @@ const Posts = () => {
   const [postComments, setPostComments] = useState({});
   const [toggleReplies, setToggleReplies] = useState({}); // for toggling replies
   const [replyComments, setReplyComments] = useState({}); // store response as replies
+  const [likedUsersDialog, setLikedUsersDialog] = useState({
+    isOpen: false,
+    postId: null,
+    users: [],
+    isLoading: false,
+  });//need to chnage this
   const postData = useSelector((s) => s.posts);
   useEffect(() => {
     handlegetAllPosts(1, true);
@@ -111,6 +118,30 @@ const Posts = () => {
   const closeConfirmDialog = () => {
     setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
   };
+  const closeLikedUsersDialog = () => {
+    setLikedUsersDialog({
+      isOpen: false,
+      postId: null,
+      users: [],
+      isLoading: false,
+    });
+  };
+
+  // const normalizeLikedUsers = (data) => {
+  //   const likesResult =
+  //     (Array.isArray(data) && data) ||
+  //     data?.likedUsers ||
+  //     data?.likes ||
+  //     data?.users ||
+  //     data?.data ||
+  //     [];
+  //   const likes = Array.isArray(likesResult) ? likesResult : [likesResult];
+
+  //   return likes
+  //     .map((like) => like?.userId || like?.user || like?.likedBy || like)
+  //     .filter(Boolean);
+  // };
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     const urls = files.map((f) => URL.createObjectURL(f));
@@ -607,6 +638,76 @@ const Posts = () => {
     }
   };
 
+  const handleGetAllLikes = async (postId) => {
+    setLikedUsersDialog({
+      isOpen: true,
+      postId,
+      users: [],
+      isLoading: true,
+    });
+
+    try {
+      const res = await axios.get(BASE_URL + "/user/likes/" + postId, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        console.log("Likes: " + res?.data?.data?.[0]?.likeByUsers);
+        setLikedUsersDialog((prev) => ({
+          ...prev,
+          users: res.data?.data?.[0]?.likeByUsers,
+          isLoading: false,
+        }));
+      } else {
+        closeLikedUsersDialog();
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          closeLikedUsersDialog();
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          closeLikedUsersDialog();
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        closeLikedUsersDialog();
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLikedUsersDialog((prev) => ({ ...prev, isLoading: false }));
+    }
+  };
   const startEditingPost = (post) => {
     setShowMenu(null);
     setEditingPostId(post._id);
@@ -792,6 +893,63 @@ const Posts = () => {
       });
     }
   };
+  const handleUserReactionPosts = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(BASE_URL + "/user/liked-posts", {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          dispatch(addPosts(res.data?.data || []));
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleExploreFeed = () => {
     setActiveButtonIndex(0);
@@ -809,6 +967,7 @@ const Posts = () => {
 
   const handleReactionsButtonClick = () => {
     setActiveButtonIndex(2);
+    handleUserReactionPosts();
   };
   const handleReply = (commentId, firstName, postId) => {
     setCommentText((prev) => ({
@@ -862,7 +1021,7 @@ const Posts = () => {
 
           {/* Reply */}
           <div
-            className="text-xs text-blue-500 hover:underline cursor-pointer"
+            className="text-xs text-blue-500 hover:underline cursor-pointer mt-2"
             onClick={() =>
               handleReply(
                 comment._id,
@@ -871,13 +1030,13 @@ const Posts = () => {
               )
             }
           >
-            reply
+            <FaRegComment size={16} />
           </div>
 
           {/* Toggle Replies */}
           {(comment?.replies?.length ?? 0) > 0 && (
             <div
-              className="text-xs text-blue-500 hover:underline cursor-pointer"
+              className="text-xs text-blue-500 hover:underline cursor-pointer mt-2"
               onClick={() => {
                 // setReplyComments((prev) => ({
                 //   ...prev,
@@ -951,7 +1110,9 @@ const Posts = () => {
             </select>
           </div>
           <textarea
-            className="flex-1 resize-none rounded-lg p-3 text-sm outline-none"
+            className={`flex-1 resize-none rounded-lg p-3 text-sm outline-none ${
+              theme === "dark" ? "placeholder-gray-500" : "placeholder-gray-400"
+            }`}//placeholder color change based on theme
             style={{
               backgroundColor: inputBg,
               color: textColor,
@@ -1386,17 +1547,29 @@ const Posts = () => {
               className="flex gap-6 text-sm"
               style={{ color: theme === "dark" ? "#888" : "#666" }}
             >
-              <button
-                className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
-                onClick={() => handleLike(post._id)}
-              >
-                {post?.likes > 0 ? (
-                  <AiFillLike size={18} color="#feba00" />
-                ) : (
-                  <AiOutlineLike size={18} />
-                )}
-                <span>{post.likes}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  className="hover:opacity-70 transition-opacity"
+                  onClick={() => handleLike(post._id)}
+                  aria-label="Like post"
+                >
+                  {post?.likes > 0 ? (
+                    <AiFillLike size={18} color="#feba00" />
+                  ) : (
+                    <AiOutlineLike size={18} />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="hover:underline hover:opacity-80 transition-opacity disabled:cursor-default disabled:hover:no-underline"
+                  onClick={() => handleGetAllLikes(post._id)}
+                  disabled={!post?.likes}
+                  title={post?.likes ? "View liked users" : "No likes yet"}
+                >
+                  {post.likes}
+                </button>
+              </div>
               <button
                 className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
                 onClick={() =>
@@ -1435,24 +1608,8 @@ const Posts = () => {
             </div>
             {openComments[post._id] && (
               <>
-                {(postComments[post._id] || []).map((comment) => (
-                  <CommentItem
-                    key={comment._id}
-                    comment={comment}
-                    level={0}
-                    inputBg={inputBg}
-                    textColor={textColor}
-                    toggleReplies={toggleReplies}
-                    setToggleReplies={setToggleReplies}
-                    replyComments={replyComments}
-                    setReplyComments={setReplyComments}
-                    handleGetNestedComments={handleGetNestedComments}
-                    handleReply={handleReply}
-                  />
-                ))}
-
                 {/* Comments */}
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-2 my-2 py-2">
                   <input
                     className="flex-1 rounded-lg px-3 py-2 text-xs outline-none"
                     style={{
@@ -1476,18 +1633,34 @@ const Posts = () => {
                     }
                   />
                   <button
-                    className="btn btn-xs px-4"
+                    className="btn btn-sm mb-1"
                     style={{
                       backgroundColor: "#feba00",
                       color: "#000",
                       border: "none",
                       fontWeight: 600,
+                      alignSelf: "center",
                     }}
                     onClick={() => handleCreateComments(post._id)}
                   >
                     Send
                   </button>
                 </div>
+                {(postComments[post._id] || []).map((comment) => (
+                  <CommentItem
+                    key={comment._id}
+                    comment={comment}
+                    level={0}
+                    inputBg={inputBg}
+                    textColor={textColor}
+                    toggleReplies={toggleReplies}
+                    setToggleReplies={setToggleReplies}
+                    replyComments={replyComments}
+                    setReplyComments={setReplyComments}
+                    handleGetNestedComments={handleGetNestedComments}
+                    handleReply={handleReply}
+                  />
+                ))}
               </>
             )}
           </div>
@@ -1499,6 +1672,112 @@ const Posts = () => {
             className="loading loading-spinner loading-md"
             style={{ color: "#feba00" }}
           ></span>
+        </div>
+      )}
+      {likedUsersDialog.isOpen && (
+        <div className="modal modal-open" onClick={closeLikedUsersDialog}>
+          <div
+            className="modal-box rounded-xl border shadow-lg p-0 max-w-md"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: theme === "dark" ? "#1D232A" : "#FFFFFF",
+              borderColor: theme === "dark" ? "#2e2e2e" : "#e0e0e0",
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-4 py-3 border-b"
+              style={{
+                borderColor: theme === "dark" ? "#2e2e2e" : "#e0e0e0",
+              }}
+            >
+              <div>
+                <h3
+                  className="text-base font-semibold"
+                  style={{ color: textColor }}
+                >
+                  Liked by
+                </h3>
+                <p
+                  className="text-xs"
+                  style={{ color: theme === "dark" ? "#aaa" : "#666" }}
+                >
+                  {likedUsersDialog?.users?.length}{" "}
+                  {likedUsersDialog?.users?.length === 1 ? "person" : "people"}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn btn-xs btn-circle mb-5"
+                onClick={closeLikedUsersDialog}
+                aria-label="Close liked users"
+              >
+                <MdClose size={20} />
+              </button>
+            </div>
+
+            <div className="max-h-[60vh] overflow-y-auto p-4">
+              {likedUsersDialog.isLoading ? (
+                <div className="flex justify-center py-8">
+                  <span
+                    className="loading loading-spinner loading-md"
+                    style={{ color: "#feba00" }}
+                  ></span>
+                </div>
+              ) : likedUsersDialog.users.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {likedUsersDialog.users.map((likedUser, index) => {
+                    return (
+                      <div
+                        key={likedUser?._id || likedUser?.id || index}
+                        className="flex gap-3 rounded-lg p-3"
+                        style={{
+                          backgroundColor: inputBg,
+                          border:
+                            theme === "dark"
+                              ? "1px solid #2e2e2e"
+                              : "1px solid #e0e0e0",
+                        }}
+                      >
+                        {likedUser?.photoUrl && (
+                          <img
+                            src={likedUser?.photoUrl}
+                            alt={"Liked user"}
+                            className="h-12 w-12 rounded-full object-cover flex-shrink-0"
+                          />
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          {(likedUser?.firstName || likedUser?.lastName) && (
+                            <p
+                              className="text-sm font-semibold"
+                              style={{ color: textColor }}
+                            >
+                              {likedUser?.firstName + " " + likedUser?.lastName}
+                            </p>
+                          )}
+                          {likedUser?.about && (
+                            <p
+                              className="text-xs mt-2 line-clamp-2"
+                              style={{ color: textColor }}
+                            >
+                              {likedUser?.about}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p
+                  className="text-center text-sm py-8"
+                  style={{ color: theme === "dark" ? "#aaa" : "#666" }}
+                >
+                  No likes yet.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       )}
       {dialog.isOpen && (
