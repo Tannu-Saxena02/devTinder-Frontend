@@ -13,6 +13,7 @@ import ConfirmDialog from "../utils/ConfirmDialog";
 import { MdClose } from "react-icons/md";
 
 const POST_LIMIT = 10;
+const COMMENT_LIMIT = 10;
 
 const Posts = () => {
   const theme = useSelector((s) => s.theme);
@@ -48,6 +49,10 @@ const Posts = () => {
   const [postsLoading, setPostsLoading] = useState(false);
   const [isAllPostsFeed, setIsAllPostsFeed] = useState(true);
 
+  const [commentPages, setCommentPages] = useState({});
+  const [hasMoreComments, setHasMoreComments] = useState({});
+  const [commentsLoading, setCommentsLoading] = useState({});
+
   const [editingPostId, setEditingPostId] = useState(null);
   const [editContent, setEditContent] = useState("");
   const [editMedia, setEditMedia] = useState([]);
@@ -65,12 +70,11 @@ const Posts = () => {
   const [postComments, setPostComments] = useState({});
   const [toggleReplies, setToggleReplies] = useState({}); // for toggling replies
   const [replyComments, setReplyComments] = useState({}); // store response as replies
-  const [likedUsersDialog, setLikedUsersDialog] = useState({
+  const [likedUsersDialog, setLikedUsersDialog] = useState({// we can make three seprate state
     isOpen: false,
-    postId: null,
     users: [],
     isLoading: false,
-  });//need to chnage this
+  }); //need to chnage this
   const postData = useSelector((s) => s.posts);
   useEffect(() => {
     handlegetAllPosts(1, true);
@@ -121,26 +125,10 @@ const Posts = () => {
   const closeLikedUsersDialog = () => {
     setLikedUsersDialog({
       isOpen: false,
-      postId: null,
       users: [],
       isLoading: false,
     });
   };
-
-  // const normalizeLikedUsers = (data) => {
-  //   const likesResult =
-  //     (Array.isArray(data) && data) ||
-  //     data?.likedUsers ||
-  //     data?.likes ||
-  //     data?.users ||
-  //     data?.data ||
-  //     [];
-  //   const likes = Array.isArray(likesResult) ? likesResult : [likesResult];
-
-  //   return likes
-  //     .map((like) => like?.userId || like?.user || like?.likedBy || like)
-  //     .filter(Boolean);
-  // };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -258,7 +246,7 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handleGetAllTopLevelComments(postId);
+              handleGetAllTopLevelComments(postId, 1, true);
             },
           });
         }
@@ -309,25 +297,51 @@ const Posts = () => {
     }
   };
 
-  const handleGetAllTopLevelComments = async (postId) => {
+  const handleGetAllTopLevelComments = async (postId, page = 1,resetComments = false) => {
+    if (commentsLoading[postId]) return;
+
     try {
-      setLoading(true);
+      setCommentsLoading((prev) => ({ ...prev, [postId]: true }));
       const res = await axios.get(BASE_URL + "/post/" + postId, {
+        params: {
+          page,
+          limit: COMMENT_LIMIT,
+        },
         withCredentials: true,
       });
 
       if (res.data.success) {
-        if (res.data?.message.length >= 0) {
-          const comments = res.data?.data ?? [];
-          setPostComments((prev) => ({
-            ...prev,
-            [postId]: comments,
-          }));
+        const commentsData = res.data?.data;
+        const comments = Array.isArray(commentsData)
+          ? commentsData
+          : commentsData?.comments || [];
+        const pagination = res.data?.pagination || {};
+        const currentPage = Number(pagination.page ?? page);
+        const totalPages = Number(pagination.pages ?? 0);
+
+        setPostComments((prev) => ({
+          ...prev,
+          [postId]:
+            resetComments || page === 1
+              ? comments
+              : [...(prev[postId] || []), ...comments],
+        }));
+
+        if (commentsData?.replies) {
           setReplyComments((prev) => ({
             ...prev,
-            [postId]: res.data?.data?.replies,
+            [postId]: commentsData.replies,
           }));
         }
+
+        setCommentPages((prev) => ({
+          ...prev,
+          [postId]: currentPage,
+        }));
+        setHasMoreComments((prev) => ({
+          ...prev,
+          [postId]: currentPage < totalPages,
+        }));
       } else {
         setDialog({
           status: false,
@@ -371,7 +385,7 @@ const Posts = () => {
         });
       }
     } finally {
-      setLoading(false);
+      setCommentsLoading((prev) => ({ ...prev, [postId]: false }));
     }
   };
   const handleGetNestedComments = async (commentId) => {
@@ -581,6 +595,9 @@ const Posts = () => {
 
       if (res.data.success) {
         const postsResult = res.data?.data || [];
+        const pagination = res.data?.pagination || {};
+        const currentPage = Number(pagination.page ?? page);
+        const totalPages = Number(pagination.pages ?? 0);
 
         if (resetPosts || page === 1) {
           dispatch(addPosts(postsResult));
@@ -588,9 +605,8 @@ const Posts = () => {
           dispatch(appendPosts(postsResult));
         }
 
-        const hasNextPage = postsResult.length === POST_LIMIT;
-        setPostPage(page);
-        setHasMorePosts(hasNextPage);
+        setPostPage(currentPage);
+        setHasMorePosts(currentPage < totalPages);
       } else {
         setDialog({
           status: false,
@@ -641,7 +657,6 @@ const Posts = () => {
   const handleGetAllLikes = async (postId) => {
     setLikedUsersDialog({
       isOpen: true,
-      postId,
       users: [],
       isLoading: true,
     });
@@ -1038,11 +1053,6 @@ const Posts = () => {
             <div
               className="text-xs text-blue-500 hover:underline cursor-pointer mt-2"
               onClick={() => {
-                // setReplyComments((prev) => ({
-                //   ...prev,
-                //   [comment._id]: comment.replies ?? [],
-                // }));
-
                 setToggleReplies((prev) => ({
                   ...prev,
                   [comment._id]: !prev[comment._id],
@@ -1112,7 +1122,7 @@ const Posts = () => {
           <textarea
             className={`flex-1 resize-none rounded-lg p-3 text-sm outline-none ${
               theme === "dark" ? "placeholder-gray-500" : "placeholder-gray-400"
-            }`}//placeholder color change based on theme
+            }`} //placeholder color change based on theme
             style={{
               backgroundColor: inputBg,
               color: textColor,
@@ -1270,7 +1280,7 @@ const Posts = () => {
           Reactions
         </button>
       </div>
-      {/* Empty state */}
+
       {postData?.length === 0 && (
         <p
           className="text-center mt-10 text-sm"
@@ -1282,7 +1292,6 @@ const Posts = () => {
 
       {/* Posts List */}
       {postData?.map((post) => {
-        // const liked = post.likes.includes("me");
         return (
           <div
             key={post._id}
@@ -1532,7 +1541,7 @@ const Posts = () => {
                     {post?.media.map((url, i) => (
                       <img
                         key={i}
-                        src={url} // "https://images.pexels.com/photos/36305686/pexels-photo-36305686.jpeg"
+                        src={url}
                         alt="attachment"
                         className="rounded-lg max-h-64 object-contain w-full"
                       />
@@ -1572,29 +1581,20 @@ const Posts = () => {
               </div>
               <button
                 className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
-                onClick={() =>
-                  // setOpenComments((p) => {
-                  //   const isOpening = !p[post._id];
-                  //   if (isOpening) {
-                  //     handleGetAllTopLevelComments(post._id);
-                  //   }
-                  //   return { ...p, [post._id]: isOpening };
-                  // })
-                  {
-                    const isOpen = !openComments[post._id];
+                onClick={() => {
+                  const isOpen = !openComments[post._id];
 
-                    // update state
-                    setOpenComments({
-                      ...openComments,
-                      [post._id]: isOpen,
-                    });
+                  // update state
+                  setOpenComments({
+                    ...openComments,
+                    [post._id]: isOpen,
+                  });
 
-                    // fetch comments when opening
-                    if (isOpen) {
-                      handleGetAllTopLevelComments(post._id);
-                    }
+                  // fetch comments when opening
+                  if (isOpen) {
+                    handleGetAllTopLevelComments(post._id, 1, true);
                   }
-                }
+                }}
               >
                 <FaRegComment size={16} />
                 {/* <span>{post.comments.length}</span> */}
@@ -1604,6 +1604,7 @@ const Posts = () => {
                 onClick={() => handleReposts(post._id)}
               >
                 <FaRetweet size={18} />
+                {post?.repostCount > 0 && <div className="text-sm">{post?.repostCount}</div>}
               </button>
             </div>
             {openComments[post._id] && (
@@ -1646,6 +1647,15 @@ const Posts = () => {
                     Send
                   </button>
                 </div>
+                {commentsLoading[post._id] &&
+                  !(postComments[post._id] || []).length && (
+                    <div className="flex justify-center py-3">
+                      <span
+                        className="loading loading-spinner loading-sm"
+                        style={{ color: "#feba00" }}
+                      ></span>
+                    </div>
+                  )}
                 {(postComments[post._id] || []).map((comment) => (
                   <CommentItem
                     key={comment._id}
@@ -1661,6 +1671,31 @@ const Posts = () => {
                     handleReply={handleReply}
                   />
                 ))}
+                {hasMoreComments[post._id] && (
+                  <button
+                    type="button"
+                    className="btn btn-xs mt-1"
+                    style={{
+                      backgroundColor: inputBg,
+                      color: textColor,
+                      border:
+                        theme === "dark"
+                          ? "1px solid #2e2e2e"
+                          : "1px solid #e0e0e0",
+                    }}
+                    disabled={commentsLoading[post._id]}
+                    onClick={() =>
+                      handleGetAllTopLevelComments(
+                        post._id,
+                        (commentPages[post._id] || 1) + 1,
+                      )
+                    }
+                  >
+                    {commentsLoading[post._id]
+                      ? "Loading..."
+                      : "Load more comments"}
+                  </button>
+                )}
               </>
             )}
           </div>
