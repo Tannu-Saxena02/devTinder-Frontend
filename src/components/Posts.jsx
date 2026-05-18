@@ -77,7 +77,7 @@ const Posts = () => {
   }); //need to chnage this
   const postData = useSelector((s) => s.posts);
   useEffect(() => {
-    handlegetAllPosts(1, true);
+    handleExploreFeed();
   }, []);
 
   useEffect(() => {
@@ -147,80 +147,6 @@ const Posts = () => {
     cursorPos.current = pos + emoji.length;
   };
 
-  const handlePosts = async () => {
-    try {
-      setLoading(true);
-      const req = {
-        postContent: content,
-        media: mediaPreview,
-        visibility: visibility === "anyone" ? "public" : "private",
-      };
-      const res = await axios.post(BASE_URL + "/createposts", req, {
-        withCredentials: true,
-      });
-      console.log("request " + JSON.stringify(res?.data?.data));
-
-      if (res.data.success) {
-        if (res.data?.message.length >= 0) {
-          setContent("");
-          setMediaPreview([]);
-          setDialog({
-            status: true,
-            isOpen: true,
-            title: "Success",
-            message: res.data.message,
-            onClose: () => {
-              setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts(1, true);
-            },
-          });
-        }
-      } else {
-        setDialog({
-          status: false,
-          isOpen: true,
-          title: "Error",
-          message: res?.data?.error,
-          onClose: closeDialog,
-        });
-      }
-    } catch (err) {
-      console.log("ERROR" + err);
-      if (err.response) {
-        if (err.response.status === 401) {
-          setDialog({
-            status: false,
-            isOpen: true,
-            title: "Unauthorized",
-            message:
-              "Session expired or unauthorized access. Please login again.",
-            onClose: () => {
-              closeDialog();
-              navigate("/login");
-            },
-          });
-        } else {
-          setDialog({
-            status: false,
-            isOpen: true,
-            title: "Error",
-            message: err?.response?.data?.error || "Something went wrong!",
-            onClose: closeDialog,
-          });
-        }
-      } else {
-        setDialog({
-          status: false,
-          isOpen: true,
-          title: "Error",
-          message: err?.message || "Unexpected error",
-          onClose: closeDialog,
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleCreateComments = async (postId) => {
     const text = commentText[postId]?.trim(); //extract value from input value
     if (!text) return;
@@ -448,6 +374,80 @@ const Posts = () => {
       setLoading(false);
     }
   };
+  const handlePosts = async () => {
+    try {
+      setLoading(true);
+      const req = {
+        postContent: content,
+        media: mediaPreview,
+        visibility: visibility === "anyone" ? "public" : "private",
+      };
+      const res = await axios.post(BASE_URL + "/createposts", req, {
+        withCredentials: true,
+      });
+      console.log("request " + JSON.stringify(res?.data?.data));
+
+      if (res.data.success) {
+        if (res.data?.message.length >= 0) {
+          setContent("");
+          setMediaPreview([]);
+          setDialog({
+            status: true,
+            isOpen: true,
+            title: "Success",
+            message: res.data.message,
+            onClose: () => {
+              setDialog((prev) => ({ ...prev, isOpen: false }));
+              handlegetAllPosts(1, true);
+            },
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: res?.data?.error,
+          onClose: closeDialog,
+        });
+      }
+    } catch (err) {
+      console.log("ERROR" + err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Unauthorized",
+            message:
+              "Session expired or unauthorized access. Please login again.",
+            onClose: () => {
+              closeDialog();
+              navigate("/login");
+            },
+          });
+        } else {
+          setDialog({
+            status: false,
+            isOpen: true,
+            title: "Error",
+            message: err?.response?.data?.error || "Something went wrong!",
+            onClose: closeDialog,
+          });
+        }
+      } else {
+        setDialog({
+          status: false,
+          isOpen: true,
+          title: "Error",
+          message: err?.message || "Unexpected error",
+          onClose: closeDialog,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleReposts = async (postId) => {
     try {
       setLoading(true);
@@ -471,7 +471,12 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts(1, true);
+              if(activeButtonIndex === 0)
+                   handleExploreFeed();
+              else if(activeButtonIndex === 1)
+                handleAllUsersPosts();
+              else if(activeButtonIndex === 2)
+                  handleReactionsButtonClick();
             },
           });
         }
@@ -723,20 +728,6 @@ const Posts = () => {
       setLikedUsersDialog((prev) => ({ ...prev, isLoading: false }));
     }
   };
-  const startEditingPost = (post) => {
-    setShowMenu(null);
-    setEditingPostId(post._id);
-    setEditContent(post?.postContent || "");
-    setEditMedia(post?.media || []);
-    setEditVisibility(post?.visibility === "anyone" ? "public" : "private");
-  };
-
-  const cancelEditingPost = () => {
-    setEditingPostId(null);
-    setEditContent("");
-    setEditMedia([]);
-    setEditVisibility("anyone");
-  };
 
   const handleEditPost = async (postId) => {
     try {
@@ -760,7 +751,12 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts(1, true);
+                if(activeButtonIndex === 0)
+                   handleExploreFeed();
+              else if(activeButtonIndex === 1)
+                handleAllUsersPosts();
+              else if(activeButtonIndex === 2)
+                  handleReactionsButtonClick();
             },
           });
         }
@@ -829,7 +825,12 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts(1, true);
+              if(activeButtonIndex === 0)
+                   handleExploreFeed();
+              else if(activeButtonIndex === 1)
+                handleAllUsersPosts();
+              else if(activeButtonIndex === 2)  
+                  handleReactionsButtonClick();
             },
           });
         }
@@ -879,17 +880,6 @@ const Posts = () => {
       setLoading(false);
     }
   };
-
-  const openDeleteConfirmDialog = (postId) => {
-    setShowMenu(null);
-    setConfirmDialog({
-      isOpen: true,
-      title: "Delete Post",
-      message: "Are you sure you want to delete this post?",
-      onConfirm: () => handleDeletePost(postId),
-    });
-  };
-
   const handleLike = async (postId) => {
     try {
       await axios.post(
@@ -897,7 +887,12 @@ const Posts = () => {
         { postId },
         { withCredentials: true },
       );
-      handlegetAllPosts(1, true);
+       if(activeButtonIndex === 0)
+                   handleExploreFeed();
+        else if(activeButtonIndex === 1)
+                handleAllUsersPosts();
+       else if(activeButtonIndex === 2)
+                  handleReactionsButtonClick();
     } catch (err) {
       setDialog({
         status: false,
@@ -965,7 +960,29 @@ const Posts = () => {
       setLoading(false);
     }
   };
+   const startEditingPost = (post) => {
+    setShowMenu(null);
+    setEditingPostId(post._id);
+    setEditContent(post?.postContent || "");
+    setEditMedia(post?.media || []);
+    setEditVisibility(post?.visibility === "anyone" ? "public" : "private");
+  };
 
+  const cancelEditingPost = () => {
+    setEditingPostId(null);
+    setEditContent("");
+    setEditMedia([]);
+    setEditVisibility("anyone");
+  };
+   const openDeleteConfirmDialog = (postId) => {
+    setShowMenu(null);
+    setConfirmDialog({
+      isOpen: true,
+      title: "Delete Post",
+      message: "Are you sure you want to delete this post?",
+      onConfirm: () => handleDeletePost(postId),
+    });
+  };
   const handleExploreFeed = () => {
     setActiveButtonIndex(0);
     setIsAllPostsFeed(true);
