@@ -89,7 +89,7 @@ const UserCard = ({ user, isShowButton }) => {
       style={{ backgroundColor: theme === "dark" ? "black" : "#DBDBDB" }}
     >
       {/* <figure> */}
-      <img src={photoUrl} className="h-auto w-full rounded-md" alt="photo" />
+      <img src={photoUrl} className="w-full h-105 rounded-md" alt="photo" />
 
       <div className="m-4 flex flex-col flex-1">
         <div className="flex flex-row">

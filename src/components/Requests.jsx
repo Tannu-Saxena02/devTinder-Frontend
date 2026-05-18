@@ -90,7 +90,7 @@ const Requests = () => {
       const res = await axios.post(
         BASE_URL + "/request/review/" + status + "/" + _id,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       console.log(
         JSON.stringify(res) + " " + JSON.stringify(res?.data?.message)
@@ -172,7 +172,7 @@ const Requests = () => {
       ) : (
         <div>
           <h1
-            className="text-bold text-white text-3xl flex justify-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]"
+            className="text-bold flex justify-center text-[16px] sm:text-[18px] md:text-[24px] lg:text-[30px]"
             style={{
               color: theme === "dark" ? "#ffffff" : "black",
               fontWeight: "bold",
@@ -194,13 +194,11 @@ const Requests = () => {
                   backgroundColor: theme === "dark" ? "black" : "#DBDBDB",
                 }}
               >
-                <div>
-                  <img
-                    alt="photo"
-                    className="rounded-full w-[110px] h-[60px] sm:w-[25px] sm:h-[80px] md:w-[75px] md:h-[60px] lg:w-[115px] lg:h-[115px]"
-                    src={photoUrl}
-                  />
-                </div>
+                <img
+                  alt="photo"
+                  className="rounded-full object-cover w-[150px] h-[38px] sm:w-[95px] sm:h-[60px] md:w-[87px] md:h-[60px] lg:w-[115px] lg:h-[115px]"
+                  src={photoUrl}
+                />
                 <div className="text-left mx-6">
                   <div
                     className="font-bold text-[10px] sm:text-[13px] md:text-[14px] lg:text-[17px]"

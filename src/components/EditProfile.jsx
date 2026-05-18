@@ -45,8 +45,8 @@ const EditProfile = ({ user }) => {
     const words = values.trim().split(/\s+/);
     const charCount = values.length;
 
-    if (charCount > 250) {
-      setAboutError("Only 250 characters allowed.");
+    if (charCount > 170) {
+      setAboutError("Only 170 characters allowed.");
       return false;
     }
 
@@ -357,7 +357,11 @@ const EditProfile = ({ user }) => {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
-
+                  {genderError && (
+                  <p style={{ color: "red", fontSize: 13, marginTop: "1%" }}>
+                    {genderError}
+                  </p>
+                )}
               <span
                 className="label-text"
                 style={{ color: theme === "dark" ? "#ffffff" : "black" }}
