@@ -46,7 +46,6 @@ const Posts = () => {
   const [showMenu, setShowMenu] = useState(null);
   const [postPage, setPostPage] = useState(1);
   const [hasMorePosts, setHasMorePosts] = useState(true);
-  const [postsLoading, setPostsLoading] = useState(false);
   const [isAllPostsFeed, setIsAllPostsFeed] = useState(true);
 
   const [commentPages, setCommentPages] = useState({});
@@ -86,14 +85,14 @@ const Posts = () => {
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 250;
 
-      if (isAllPostsFeed && isNearBottom && hasMorePosts && !postsLoading) {
+      if (isAllPostsFeed && isNearBottom && hasMorePosts) {
         handlegetAllPosts(postPage + 1);
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isAllPostsFeed, hasMorePosts, postPage, postsLoading]);
+  }, [isAllPostsFeed, hasMorePosts, postPage]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -398,7 +397,12 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              handlegetAllPosts(1, true);
+              if(activeButtonIndex === 0)
+                   handleExploreFeed();
+              else if(activeButtonIndex === 1)
+                handleAllUsersPosts();
+              else if(activeButtonIndex === 2)
+                  handleReactionsButtonClick();
             },
           });
         }
@@ -586,10 +590,7 @@ const Posts = () => {
   };
   const handlegetAllPosts = async (page = 1, resetPosts = false) => {
     try {
-      if (postsLoading) return;
-
-      setPostsLoading(true);
-
+      setLoading(true);
       const res = await axios.get(BASE_URL + "/user/allposts", {
         params: {
           page,
@@ -655,7 +656,7 @@ const Posts = () => {
         });
       }
     } finally {
-      setPostsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -1554,13 +1555,13 @@ const Posts = () => {
                   {post?.postContent}
                 </p>
                 {post?.media?.length > 0 && (
-                  <div className="flex flex-row gap-2 mb-4">
+                  <div className="flex w-full flex-row flex-wrap gap-2 mb-4">
                     {post?.media.map((url, i) => (
                       <img
                         key={i}
                         src={url}
                         alt="attachment"
-                        className="rounded-lg max-h-64 object-contain w-full"
+                        className="h-38 w-38 shrink-0 rounded-lg object-cover sm:h-36 sm:w-36"
                       />
                     ))}
                   </div>
@@ -1718,14 +1719,6 @@ const Posts = () => {
           </div>
         );
       })}
-      {postsLoading && (
-        <div className="flex justify-center py-5">
-          <span
-            className="loading loading-spinner loading-md"
-            style={{ color: "#feba00" }}
-          ></span>
-        </div>
-      )}
       {likedUsersDialog.isOpen && (
         <div className="modal modal-open" onClick={closeLikedUsersDialog}>
           <div
@@ -1775,7 +1768,8 @@ const Posts = () => {
                     style={{ color: "#feba00" }}
                   ></span>
                 </div>
-              ) : likedUsersDialog.users.length > 0 ? (
+              ) :
+               likedUsersDialog.users.length > 0 ? (
                 <div className="flex flex-col gap-3">
                   {likedUsersDialog.users.map((likedUser, index) => {
                     return (
