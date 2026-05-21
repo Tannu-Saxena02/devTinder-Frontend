@@ -59,6 +59,8 @@ const Posts = () => {
   const [activeButtonIndex, setActiveButtonIndex] = useState(-1);
 
   const pickerRef = useRef(null);
+  const pickerButtonRef = useRef(null);
+  const menuRef = useRef(null);
   const textareaRef = useRef(null);
   const cursorPos = useRef(0);
 
@@ -96,17 +98,27 @@ const Posts = () => {
 
   useEffect(() => {
     const handler = (e) => {
-      if (
-        pickerRef.current &&
-        !pickerRef.current.contains(e.target) &&
-        !textareaRef.current?.contains(e.target)
-      ) {
+      const clickedPicker = pickerRef.current?.contains(e.target);
+      const clickedPickerButton = pickerButtonRef.current?.contains(e.target);
+
+      if (!clickedPicker && !clickedPickerButton) {
         setShowPicker(false);
       }
     };
     // It listens for any mousedown event on the entire page.
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler); // cler this event
+  }, []);
+
+  useEffect(() => {
+    const closeMenu = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", closeMenu);
+    return () => document.removeEventListener("mousedown", closeMenu);
   }, []);
   const timeAgo = (date) => {
     const diff = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -1201,7 +1213,7 @@ const Posts = () => {
           >
             {content.length}/500
           </span>
-          <div className="flex items-center gap-2 relative" ref={pickerRef}>
+          <div className="flex items-center gap-2 relative">
             <label style={{ cursor: "pointer", fontSize: 18 }}>
               📎
               <input
@@ -1213,6 +1225,8 @@ const Posts = () => {
               />
             </label>
             <button
+              type="button"
+              ref={pickerButtonRef}
               onClick={() => setShowPicker((prev) => !prev)}
               style={{
                 background: "transparent",
@@ -1356,6 +1370,7 @@ const Posts = () => {
               </div>
             </div>
             <div
+              ref={showMenu === post._id ? menuRef : null}
               style={{
                 position: "relative",
                 display: "flex",
