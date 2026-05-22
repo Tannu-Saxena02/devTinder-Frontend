@@ -312,6 +312,9 @@ const Posts = () => {
           ...prev,
           [postId]: currentPage < totalPages,
         }));
+          if (activeButtonIndex === 0) handleExploreFeed();
+          else if (activeButtonIndex === 1) handleAllUsersPosts();
+          else if (activeButtonIndex === 2) handleReactionsButtonClick();
       } else {
         setDialog({
           status: false,
@@ -1684,7 +1687,7 @@ const Posts = () => {
                 }}
               >
                 <FaRegComment size={16} />
-                {/* <span>{post.comments.length}</span> */}
+                {post?.commentCount >0 && <span>{post?.commentCount}</span>}
               </button>
               <button
                 className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
