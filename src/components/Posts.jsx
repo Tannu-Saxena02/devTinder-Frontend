@@ -39,7 +39,6 @@ const Posts = () => {
   const cardBg = theme === "dark" ? "#1a1a1a" : "#f5f5f5";
   const inputBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
 
-  const [posts, setPosts] = useState([]);
   const [content, setContent] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const [mediaPreview, setMediaPreview] = useState([]);
@@ -71,7 +70,8 @@ const Posts = () => {
   const [postComments, setPostComments] = useState({});
   const [toggleReplies, setToggleReplies] = useState({}); // for toggling replies
   const [replyComments, setReplyComments] = useState({}); // store response as replies
-  const [likedUsersDialog, setLikedUsersDialog] = useState({// we can make three seprate state
+  const [likedUsersDialog, setLikedUsersDialog] = useState({
+    // we can make three seprate state
     isOpen: false,
     users: [],
     isLoading: false,
@@ -143,13 +143,42 @@ const Posts = () => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const urls = files.map((f) => URL.createObjectURL(f));
-    setMediaPreview((prev) => [...prev, ...urls]);
+    const previews = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+    setMediaPreview((prev) => [...prev, ...previews]);
+    e.target.value = "";
   };
+
+  const removeMediaPreview = (index) => {
+    setMediaPreview((prev) => {
+      URL.revokeObjectURL(prev[index].url);
+      return prev.filter((_, idx) => idx !== index);
+    });
+  };
+
+  const getMediaUrl = (media) => {
+    const url = typeof media === "string" ? media : media?.url;
+    if (!url) return ""; //returns empty string if no URL
+    // returns direct URL for: http https  blob otherwise adds backend URL before relative path
+    if (url.startsWith("http") || url.startsWith("https") || url.startsWith("blob:")) {
+      return url;
+    }
+    return `${BASE_URL.replace("/api", "")}/${url.replace(/^\/+/, "")}`;
+  };
+
   const handleEditFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const urls = files.map((f) => URL.createObjectURL(f));
-    setEditMedia((prev) => [...prev, ...urls]);
+
+    const newMedia = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+      isExisting: false,
+    }));
+
+    setEditMedia((prev) => [...prev, ...newMedia]);
+    e.target.value = "";
   };
   const handleEmojiClick = (emojiData) => {
     const pos = cursorPos.current;
@@ -234,7 +263,11 @@ const Posts = () => {
     }
   };
 
-  const handleGetAllTopLevelComments = async (postId, page = 1,resetComments = false) => {
+  const handleGetAllTopLevelComments = async (
+    postId,
+    page = 1,
+    resetComments = false,
+  ) => {
     if (commentsLoading[postId]) return;
 
     try {
@@ -388,12 +421,19 @@ const Posts = () => {
   const handlePosts = async () => {
     try {
       setLoading(true);
-      const req = {
-        postContent: content,
-        media: mediaPreview,
-        visibility: visibility === "anyone" ? "public" : "private",
-      };
-      const res = await axios.post(BASE_URL + "/createposts", req, {
+      const formData = new FormData();
+
+      formData.append("postContent", content);
+      formData.append(
+        "visibility",
+        visibility === "anyone" ? "public" : "private",
+      );
+
+      mediaPreview.forEach(({ file }) => {
+        formData.append("media", file);
+      });
+
+      const res = await axios.post(BASE_URL + "/createposts", formData, {
         withCredentials: true,
       });
       console.log("request " + JSON.stringify(res?.data?.data));
@@ -401,6 +441,7 @@ const Posts = () => {
       if (res.data.success) {
         if (res.data?.message.length >= 0) {
           setContent("");
+          mediaPreview.forEach(({ url }) => URL.revokeObjectURL(url));
           setMediaPreview([]);
           setDialog({
             status: true,
@@ -409,12 +450,9 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              if(activeButtonIndex === 0)
-                   handleExploreFeed();
-              else if(activeButtonIndex === 1)
-                handleAllUsersPosts();
-              else if(activeButtonIndex === 2)
-                  handleReactionsButtonClick();
+              if (activeButtonIndex === 0) handleExploreFeed();
+              else if (activeButtonIndex === 1) handleAllUsersPosts();
+              else if (activeButtonIndex === 2) handleReactionsButtonClick();
             },
           });
         }
@@ -487,12 +525,9 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              if(activeButtonIndex === 0)
-                   handleExploreFeed();
-              else if(activeButtonIndex === 1)
-                handleAllUsersPosts();
-              else if(activeButtonIndex === 2)
-                  handleReactionsButtonClick();
+              if (activeButtonIndex === 0) handleExploreFeed();
+              else if (activeButtonIndex === 1) handleAllUsersPosts();
+              else if (activeButtonIndex === 2) handleReactionsButtonClick();
             },
           });
         }
@@ -745,14 +780,32 @@ const Posts = () => {
   const handleEditPost = async (postId) => {
     try {
       setLoading(true);
-      const req = {
-        postContent: editContent,
-        media: editMedia,
-        visibility: editVisibility === "anyone" ? "public" : "private",
-      };
-      const res = await axios.put(BASE_URL + "/posts/edit/" + postId, req, {
-        withCredentials: true,
+      const formData = new FormData();
+
+      formData.append("postContent", editContent);
+      formData.append(
+        "visibility",
+        editVisibility === "anyone" ? "public" : "private",
+      );
+
+      const existingMedia = [];
+
+      editMedia.forEach((item) => {
+        if (item.isExisting) {
+          existingMedia.push(item.url);
+        } else if (item.file) {
+          formData.append("media", item.file);
+        }
       });
+
+      formData.append("existingMedia", JSON.stringify(existingMedia));
+      const res = await axios.put(
+        BASE_URL + "/posts/edit/" + postId,
+        formData,
+        {
+          withCredentials: true,
+        },
+      );
 
       if (res.data.success) {
         if (res.data?.message.length >= 0) {
@@ -764,12 +817,9 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-                if(activeButtonIndex === 0)
-                   handleExploreFeed();
-              else if(activeButtonIndex === 1)
-                handleAllUsersPosts();
-              else if(activeButtonIndex === 2)
-                  handleReactionsButtonClick();
+              if (activeButtonIndex === 0) handleExploreFeed();
+              else if (activeButtonIndex === 1) handleAllUsersPosts();
+              else if (activeButtonIndex === 2) handleReactionsButtonClick();
             },
           });
         }
@@ -838,12 +888,9 @@ const Posts = () => {
             message: res.data.message,
             onClose: () => {
               setDialog((prev) => ({ ...prev, isOpen: false }));
-              if(activeButtonIndex === 0)
-                   handleExploreFeed();
-              else if(activeButtonIndex === 1)
-                handleAllUsersPosts();
-              else if(activeButtonIndex === 2)  
-                  handleReactionsButtonClick();
+              if (activeButtonIndex === 0) handleExploreFeed();
+              else if (activeButtonIndex === 1) handleAllUsersPosts();
+              else if (activeButtonIndex === 2) handleReactionsButtonClick();
             },
           });
         }
@@ -900,12 +947,9 @@ const Posts = () => {
         { postId },
         { withCredentials: true },
       );
-       if(activeButtonIndex === 0)
-                   handleExploreFeed();
-        else if(activeButtonIndex === 1)
-                handleAllUsersPosts();
-       else if(activeButtonIndex === 2)
-                  handleReactionsButtonClick();
+      if (activeButtonIndex === 0) handleExploreFeed();
+      else if (activeButtonIndex === 1) handleAllUsersPosts();
+      else if (activeButtonIndex === 2) handleReactionsButtonClick();
     } catch (err) {
       setDialog({
         status: false,
@@ -973,11 +1017,19 @@ const Posts = () => {
       setLoading(false);
     }
   };
-   const startEditingPost = (post) => {
+  const startEditingPost = (post) => {
     setShowMenu(null);
     setEditingPostId(post._id);
+
     setEditContent(post?.postContent || "");
-    setEditMedia(post?.media || []);
+
+    setEditMedia(
+      (post?.media || []).map((url) => ({
+        url,
+        file: null,
+        isExisting: true,
+      })),
+    );
     setEditVisibility(post?.visibility === "anyone" ? "public" : "private");
   };
 
@@ -987,7 +1039,7 @@ const Posts = () => {
     setEditMedia([]);
     setEditVisibility("anyone");
   };
-   const openDeleteConfirmDialog = (postId) => {
+  const openDeleteConfirmDialog = (postId) => {
     setShowMenu(null);
     setConfirmDialog({
       isOpen: true,
@@ -1042,7 +1094,6 @@ const Posts = () => {
           marginLeft: `${level * 25}px`,
         }}
       >
-        {/* Comment Row */}
         <div className="flex gap-2 items-start">
           <img
             src={comment.userId?.photoUrl}
@@ -1078,7 +1129,6 @@ const Posts = () => {
             <FaRegComment size={16} />
           </div>
 
-          {/* Toggle Replies */}
           {(comment?.replies?.length ?? 0) > 0 && (
             <div
               className="text-xs text-blue-500 hover:underline cursor-pointer mt-2"
@@ -1173,7 +1223,7 @@ const Posts = () => {
 
         {mediaPreview.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
-            {mediaPreview.map((url, i) => (
+            {mediaPreview.map(({ url }, i) => (
               <div key={i} className="relative inline-block">
                 <img
                   src={url}
@@ -1181,11 +1231,7 @@ const Posts = () => {
                   className="rounded-lg max-h-40 object-cover"
                 />
                 <button
-                  onClick={() =>
-                    setMediaPreview((prev) =>
-                      prev.filter((_, idx) => idx !== i),
-                    )
-                  }
+                  onClick={() => removeMediaPreview(i)}
                   style={{
                     position: "absolute",
                     top: -6,
@@ -1267,7 +1313,7 @@ const Posts = () => {
           </div>
         </div>
       </div>
-      {/* //here */}
+
       <div className="flex gap-2 mt-2 mb-4">
         <button
           type="button"
@@ -1377,8 +1423,7 @@ const Posts = () => {
                 justifyContent: "flex-end",
               }}
             >
-              {/* Three dots icon */}
-              {editingPostId !== post._id &&
+              {editingPostId !== post._id /* Three dots icon */ &&
                 post.isEditable &&
                 post.isDeletable && (
                   <BsThreeDots
@@ -1481,10 +1526,13 @@ const Posts = () => {
                 />
                 {editMedia.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {editMedia.map((url, i) => (
-                      <div key={url + i} className="relative inline-block">
+                    {editMedia.map((media, i) => (
+                      <div
+                        key={(media?.url || "") + i}
+                        className="relative inline-block"
+                      >
                         <img
-                          src={url}
+                          src={getMediaUrl(media)}
                           alt="attachment"
                           className="rounded-lg max-h-40 object-cover"
                         />
@@ -1522,7 +1570,13 @@ const Posts = () => {
                     {editContent.length}/500
                   </span>
                   <div className="flex items-center gap-2">
-                    <label style={{ cursor: "pointer", fontSize: 13 }}>
+                    <label
+                      style={{
+                        cursor: "pointer",
+                        fontSize: 13,
+                        color: textColor,
+                      }}
+                    >
                       Attach
                       <input
                         type="file"
@@ -1571,10 +1625,10 @@ const Posts = () => {
                 </p>
                 {post?.media?.length > 0 && (
                   <div className="flex w-full flex-row flex-wrap gap-2 mb-4">
-                    {post?.media.map((url, i) => (
+                    {post?.media.map((media, i) => (
                       <img
                         key={i}
-                        src={url}
+                        src={getMediaUrl(media)}
                         alt="attachment"
                         className="h-38 w-38 shrink-0 rounded-lg object-cover sm:h-36 sm:w-36"
                       />
@@ -1637,7 +1691,9 @@ const Posts = () => {
                 onClick={() => handleReposts(post._id)}
               >
                 <FaRetweet size={18} />
-                {post?.repostCount > 0 && <div className="text-sm">{post?.repostCount}</div>}
+                {post?.repostCount > 0 && (
+                  <div className="text-sm">{post?.repostCount}</div>
+                )}
               </button>
             </div>
             {openComments[post._id] && (
@@ -1783,8 +1839,7 @@ const Posts = () => {
                     style={{ color: "#feba00" }}
                   ></span>
                 </div>
-              ) :
-               likedUsersDialog.users.length > 0 ? (
+              ) : likedUsersDialog.users.length > 0 ? (
                 <div className="flex flex-col gap-3">
                   {likedUsersDialog.users.map((likedUser, index) => {
                     return (
